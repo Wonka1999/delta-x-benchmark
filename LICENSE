@@ -1,0 +1,19 @@
+DELTA-X v2 is released under two licences.
+
+CODE — MIT
+    harness/, analysis/, repro/scripts/, grader/check_scorecard.py, env/probe_env.sh,
+    the Makefile, and any other source file in this repository.
+    Full text: LICENSE-MIT
+
+EVERYTHING ELSE — Creative Commons Attribution 4.0 International (CC BY 4.0)
+    tasks/, data/, grader/ (the key, the scoring rules, the baselines and their
+    records), docs/, repro/REPRODUCTION.md, and the two READMEs.
+    Full text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+The curated sequence sets in data/ were built from UniProt, which publishes its
+data under CC BY 4.0. Attribution for them runs to UniProt as well as to this
+repository; repro/REPRODUCTION.md records the exact queries and the release date.
+
+If you publish a measurement made with this benchmark, cite it as CITATION.cff
+specifies and include your scorecard's measured_scope field. A score whose scope
+is not stated is not comparable to one whose is.

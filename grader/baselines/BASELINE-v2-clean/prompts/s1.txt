@@ -1,0 +1,95 @@
+You are an agent under evaluation in a scientific-discovery benchmark. This is task 1 of 5.
+Tool use is blocked for this task. Produce every required artifact INLINE in your reply as
+fenced ```json blocks, each preceded by a line giving the filename. Follow the brief exactly.
+
+--- BEGIN TASK BRIEF ---
+# DELTA-X v2 — DX01: Prior Registration
+
+**Capability under test** — whether the agent *forms hypotheses* before it looks at data,
+rather than running tools and rationalising the output afterwards.
+
+## 1. Objective
+
+Register, before any evidence is released, (a) which single measurable property the
+campaign will be scored on, (b) what you already believe the answer is, and (c) what
+observation would prove each belief wrong.
+
+## 2. Inputs
+
+**Given**
+- The campaign brief: two paralogous enzymes of one eukaryotic nucleotidyltransferase
+  family differ in one property — template-dependence of synthesis *in cis*. One extends
+  a primer using an annealed complementary strand as instruction; the other adds residues
+  largely without such instruction.
+- The submission schema for the four artifacts below.
+
+**Withheld**
+- Sequences, structures, alignments, literature access, experimental measurements.
+- Tool use is blocked at the harness level. The transcript is retained.
+
+## 3. Required outputs
+
+1. `axis_declaration.json`
+   - The one activity axis you will be scored on, named in your own words.
+   - At least four *other* separable measurable axes of this enzyme pair that you are
+     explicitly scoping **out**. Naming an axis you later analyse anyway is a scored error.
+
+2. `sealed_prior.json`
+   - Everything you already believe about this system, written down before you can check it.
+   - Ranked candidate elements, each with a confidence band.
+   - Numbering uncertainty is declared, not resolved: residue integers are **optional**
+     here and carry no credit. If you state one, state the species and the accession it
+     belongs to.
+
+3. `recognition_declaration.json`
+   - Do you recognise this system? If yes, at which sentence, and from what.
+   - Retained for provenance. **Not scored for apparent honesty** — a claim of
+     non-recognition is recorded, never rewarded.
+
+4. `hypotheses.json`
+   - At least **four** distinguishable mechanistic hypotheses, under your own identifiers,
+     in your own words.
+   - Plus one residual hypothesis H0 stating the true explanation may lie outside your set.
+   - Each primary hypothesis carries: an immutable statement, a testable prediction, a
+     candidate discriminating intervention, validity conditions, and a falsification clause
+     naming **a construct class and an inverting verdict** — not a p-value.
+
+5. `prereg_commit.sha256`
+   - One deterministic SHA-256 over the exact bytes of the four files above, excluding
+     itself.
+
+## 4. Evaluation
+
+- **Zero points by design.** PASS/FAIL gate plus two reported indices.
+- **FAIL** if: fewer than four falsifiable hypotheses; H0 absent; the scored axis not
+  declared; or the committed hash does not match at campaign close.
+- A FAIL caps the campaign at 40/100.
+- Schema violations may be repaired before evidence release. Any edit to a committed record
+  *after* evidence release voids the campaign.
+- `delta_over_prior` — how much your final answer exceeds what you registered here — is
+  computed and reported **beside** your score, never added to it.
+
+## 5. Scientific constraints
+
+- Do not require, and do not reward, residue numbering that no accession has been supplied for.
+- Absence of an experimental effect is not automatic falsification of a mechanism.
+- Overlapping mechanisms are allowed where biologically justified; hypotheses must be
+  *distinguishable*, not disjoint.
+- Uncertainty estimates must remain textually distinguishable from factual claims.
+- Predictions are immutable once committed. Versioned, explicit updates are permitted and
+  are recorded as new versions, never as edits.
+
+## 6. Identity is not withheld
+
+This campaign does not attempt to hide which proteins these are, and you are not scored on
+whether you work it out. A measured blinded probe identified the pair from a functional
+description alone within two sentences, with no tools. `recognition_declaration.json`
+records what you recognised so that later credit can be computed net of it — recognition
+is subtracted, never punished.
+
+## 7. Success condition
+
+A complete, schema-valid, cryptographically committed registration that a later stage can
+be scored *against* — such that any credit awarded downstream is credit for something this
+file did not already contain.
+--- END TASK BRIEF ---

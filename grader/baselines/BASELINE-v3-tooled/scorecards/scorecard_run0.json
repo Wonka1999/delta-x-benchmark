@@ -1,0 +1,188 @@
+{
+ "schema": "delta-x-v2/scorecard/1",
+ "submission_id": "BASELINE-v3-tooled/run0",
+ "graded_utc": "2026-11-09",
+ "brief_digests": {
+  "agent_facing/DX01.md": "a252eda0ab30c4cf95299444613e33a09a1cec0587711e1a2f78ae9dae0d7c76",
+  "agent_facing/DX02B.md": "1761db7bfa2561c71205e9a34b87b7916f3f3740f4b5f46684465dcd1698f83d",
+  "agent_facing/DX02.md": "e252d2d99481dd72d00a4e5cdf31aac1af427184249a1edaa2d71dca78e6a384",
+  "agent_facing/DX03.md": "fb8aef3c025e7397146725b16ae1c967ed85160ecf65d280c3403521ff307cb3",
+  "agent_facing/DX04.md": "a706fc642593cd163e98a664ee2ecadb772d051c9d6db9ce9adbdd58cdc438d1",
+  "agent_facing/DX05.md": "e89f467917d874ef0c0940c9d8bd504e1b4744d38de2ce176115a10d35f15d40",
+  "agent_facing/ENVIRONMENT.md": "7b6e5039f5aafee84cf9be66fe4ee71049d4ed35a2aef368b53aac3d4b0236f7"
+ },
+ "key_digest": "see grader/KEY.md as applied 2026-11-09",
+ "grader": "subagent panel; adversarial re-check ran on DX02 and DX03 (0 overturns on DX02, 4 non-scoring sub-row corrections on DX03)",
+ "gates": [
+  {
+   "gate_id": "DX01.a",
+   "statement": "DX01.md §4 FAIL criterion (a) — \"fewer than four falsifiable hypotheses\"; §3.4 each primary carries a falsification clause naming a construct class and an inverting verdict, \"not a p-value\"",
+   "verdict": "PASS",
+   "submission_quote": "That verdict inverts H1 and I will record H1 as falsified.",
+   "submission_cite": "hypotheses.json#H1_LOOP_OCCLUSION (hypotheses.json#L23)",
+   "consequence": "none",
+   "plain": "Run0 registered five distinct falsifiable mechanisms, each naming the constructs that would test it and the result that would kill it, with no statistical cutoff smuggled into the kill condition."
+  },
+  {
+   "gate_id": "DX01.b",
+   "statement": "DX01.md §4 FAIL criterion (b) — \"H0 absent\"; §3.4 \"one residual hypothesis H0 stating the true explanation may lie outside your set\"",
+   "verdict": "PASS",
+   "submission_quote": "The actual mechanistic basis of the difference on the scored axis may be none of H1-H5",
+   "submission_cite": "hypotheses.json#H0_RESIDUAL (hypotheses.json#L105)",
+   "consequence": "none",
+   "plain": "Run0 wrote down that the real answer might be none of its five guesses, which is exactly what H0 is for."
+  },
+  {
+   "gate_id": "DX01.c",
+   "statement": "DX01.md §4 FAIL criterion (c) — \"the scored axis not declared\"; §3.1 \"At least four *other* separable measurable axes ... you are explicitly scoping out\"",
+   "verdict": "PASS",
+   "submission_quote": "How strongly nucleotide addition at a DNA 3'-OH primer terminus is instructed by a complementary strand annealed to that same primer (in cis)",
+   "submission_cite": "axis_declaration.json#L7 (scored_axis.name_in_my_words)",
+   "consequence": "none",
+   "plain": "Run0 named the one property it will be judged on and fenced off six others it promises not to use as evidence."
+  },
+  {
+   "gate_id": "DX01.d",
+   "statement": "KEY.md \"FAIL criterion (d) — as it now reads\" (KEY.md:36-48): \"A declared-uncomputable digest accompanied by a deterministic canonicalisation rule is NOT a FAIL\"; graded against that criterion block, ",
+   "verdict": "PASS",
+   "submission_quote": "DECLARED_UNCOMPUTABLE_AT_REGISTRATION",
+   "submission_cite": "prereg_commit.json#L7 (digest_status), with \"digest\": null at prereg_commit.json#L5",
+   "consequence": "none",
+   "plain": "Run0 refused to invent a hash, said so in writing, and instead gave a recipe precise enough that I recomputed its commitment and got the harness's number exactly."
+  }
+ ],
+ "items": [
+  {
+   "item_id": "DX02.I1.run0.SUMMARY",
+   "task": "DX02",
+   "max": 10,
+   "asks": "DX02.md section 4 rule 1 — denominator and rounding",
+   "submission": {
+    "quote": "\"named_executable_programs\": [\n    \"mafft\",\n    \"hmmbuild\",\n    \"hmmsearch\",\n    \"plmc\",\n    \"colabfold_batch\",\n    \"TMalign\"\n  ]",
+    "cite": "run0/method_plan.json#named_executable_programs (L12-19)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX02.md section 4 rule 1 — denominator and rounding",
+     "verdict": "CONFIRMED",
+     "why": "Seven programs, every one of them gated on something about its input rather than on its own output, every threshold carrying a number with either a citation or a shown derivation, and every floor pre-declared as a quantity to measure and publish rather than as a stop. Full marks. The plan's own prog",
+     "estimator": "n/a — summary row; the per-program estimators are named on their own rows"
+    }
+   ],
+   "awarded": 10.0,
+   "arithmetic": "|Prog| = 7 — mafft (L29), python3 (L51), hmmbuild (L72), hmmsearch (L94), plmc (L116), colabfold_batch (L138), TMalign (L160), one distinct binary per exact_invocation, each counted once however many times it appears in its own string. qualifying = 7. denominator = max(|Prog|, 3) = max(7, 3) = 7. aw",
+   "deductions": [],
+   "plain": "Seven programs, every one of them gated on something about its input rather than on its own output, every threshold carrying a number with either a citation or a shown derivation, and every floor pre-declared as a quantity to measure and publish rather than as a stop. Full marks. The plan's own program list names six because it deliberately excludes the Python script; counting the script or not ma",
+   "borderline": "Yes, in both directions. 10.0 rests on three rows I flagged individually — mafft (rule 3, unverified Katoh table cite), hmmbuild (rule 4 scope clause, a floor that genuinely fires) and colabfold_batch (rule 2's two-test split). Failing any one gives 10 x 6/7 = 8.5; failing two gives 10 x 5/7 = 7.0. A perfect score on a rubric whose previous three records scored 3.0 / 1.0 / 5.0 deserves scepticism,"
+  },
+  {
+   "item_id": "DX03.I1",
+   "task": "DX03",
+   "max": 12,
+   "asks": "DX03.md §4 / KEY.md:231,234 — region recovered by two independent methods, both numbers attached, endpoints within ±6 per endpoint, enrichment test separating it from background; a span with no attached statistic scores ",
+   "submission": {
+    "quote": "\"start\": 378,\n   \"end\": 398,",
+    "cite": "nominated_regions.json#R1_core (L8-L9)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4 / KEY.md:231,234 — region recovered by two independent methods, both numbers attached, endpoints within ±6 per endpoint, enrichment test separating it from background; a span with no attach",
+     "verdict": "PASS",
+     "why": "It nominated one region, the right one, with every endpoint inside the six-residue tolerance in both species frames, gave a number and a permutation p-value from two genuinely different methods, and showed the region stands out from the rest of the protein.",
+     "estimator": "endpoint check: residue index, 1-based over the full-length reference sequence, in the frame the submission reports (P09838 / Q9NP87). Granularity floor: block-10 spatial-permutation-null FWER p<0.05 on the submission's OWN window scan (finest significant 11 for M2 / 15 for M1), not the key's HMM-profile permutation null."
+    }
+   ],
+   "awarded": 12.0,
+   "arithmetic": "12 (all four conditions PASS) − 0 (no nomination finer than the submission's own licensed floor) = 12.0",
+   "deductions": [],
+   "plain": "It nominated one region, the right one, with every endpoint inside the six-residue tolerance in both species frames, gave a number and a permutation p-value from two genuinely different methods, and showed the region stands out from the rest of the protein.",
+   "borderline": "MOST LIKELY TO MOVE. The nominated span's own M1 mean (0.2295) is struck for citing a non-existent log record, leaving M1 resting on the adjacent w=21 window 377-397 and the w=31 window 378-408. A stricter grader could dock up to ~2. I would not reverse: the struck command reproduces byte-identically when re-run."
+  },
+  {
+   "item_id": "DX03.I2",
+   "task": "DX03",
+   "max": 6,
+   "asks": "DX03.md §4 / KEY.md:360 — method_sensitivity.json present and correct: unstable mapping zone identified and affected span endpoints flagged",
+   "submission": {
+    "quote": "No nominated endpoint lies in an unstable zone. The interior of the region contains an unstable zone (P09838 388-397 / Q9NP87 373-381) where the cross-subfamily residue pairing changes between alignments; no residue pair inside it is reported.",
+    "cite": "method_sensitivity.json#MS_span_flags (L163)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4 / KEY.md:360 — method_sensitivity.json present and correct: unstable mapping zone identified and affected span endpoints flagged",
+     "verdict": "PASS",
+     "why": "It found exactly the stretch of the loop where different alignment programs disagree about which residue pairs with which, said so, and checked that none of the boundaries it reported sits inside that stretch.",
+     "estimator": "count of P09838 positions whose Q9NP87 partner column changes across {mafft --auto FFT-NS-i, FFT-NS-2, L-INS-i, hmmalign} on 489 sequences. The key's estimator is 4 MAFFT modes on 7 references, so the protein-wide totals (67 vs 17/100) are NOT comparable; only the zone is."
+    }
+   ],
+   "awarded": 6.0,
+   "arithmetic": "6 (zone identified, exact match to the key's 388-397 + all four endpoints flagged) = 6.0",
+   "deductions": [],
+   "plain": "It found exactly the stretch of the loop where different alignment programs disagree about which residue pairs with which, said so, and checked that none of the boundaries it reported sits inside that stretch.",
+   "borderline": "Two reversal routes. Its scan also marks 414-419 and 356-360 unstable, inside the window where the key measured all four MAFFT modes agreeing — a different estimator (hmmalign, 489 seqs), so I did not score it as an error, but a grader reading 'correct' against the key's position list would dock. Separately, a grader could read 'the affected span endpoints are flagged' as requiring an endpoint act"
+  },
+  {
+   "item_id": "DX03.I3",
+   "task": "DX03",
+   "max": 10,
+   "asks": "DX03.md §4 / KEY.md:328 — composition-versus-length resolved correctly with the statistic; a claim on either side the data does not support is scored as an error; zero = a length claim; full credit = variance and/or comp",
+   "submission": {
+    "quote": "\"verdict\": \"DOES NOT DIFFER beyond within-subfamily variation\",",
+    "cite": "segment_properties.json#SP_R1_core_length (L34)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4 / KEY.md:328 — composition-versus-length resolved correctly with the statistic; a claim on either side the data does not support is scored as an error; zero = a length claim; full credit = ",
+     "verdict": "PASS",
+     "why": "The trap here is to say TdT's loop is longer; it is not, and this run measured that, reported both medians as 21, refused to be fooled by a tiny p-value sitting on a zero difference, and showed instead that the chemistry differs sharply — exactly the anti-saturated item 3 of 3 clean-room runs got wr",
+     "estimator": "|Cliff's delta| of the per-sequence value over the span's L-INS-i alignment columns, A minus B, against two DECLARED thresholds: null_1_splithalf_abs_delta_q95 (200 split-half draws) and null_2 background quantile of |delta| over 64 same-width windows. Explicitly NOT the Mann-Whitney p, which the submission declines as the decision statistic. Variance estimator: per-subfamily sample sd of the same per-sequence residue count."
+    }
+   ],
+   "awarded": 10.0,
+   "arithmetic": "10 (length side correct: medians 21.0 vs 21.0, |delta| 0.2358 < q95 0.5612 despite MW p=2.03e-08 + composition side correct with statistic: frac_hydrophobic |delta| 0.9724, p=6.58e-74, background quantile 1.0, verdict \"DIFFERS: |delta| exceeds split-half null q95 and lies in top 5% of background win",
+   "deductions": [],
+   "plain": "The trap here is to say TdT's loop is longer; it is not, and this run measured that, reported both medians as 21, refused to be fooled by a tiny p-value sitting on a zero difference, and showed instead that the chemistry differs sharply — exactly the anti-saturated item 3 of 3 clean-room runs got wrong.",
+   "borderline": "Two routes down. (1) The variance numbers appear as reported fields, not as a stated conclusion; a grader requiring the submission to say 'what differs is variance' would call this composition-without-variance = Partial, which KEY.md:328 never assigns a number to, so that grader must invent the value. (2) sealed_prior.json#L31 pre-registers 'this loop is longer and/or ordered over the template-bin"
+  },
+  {
+   "item_id": "DX03.I4",
+   "task": "DX03",
+   "max": 7,
+   "asks": "DX03.md §4 / KEY.md:334 — over-nomination control, opens at 7, −2.5 per nominated region that is a member of the frozen decoy set, floor 0 for this item, no cap on nominations",
+   "submission": {
+    "quote": "\"kind\": \"SAME region, M1-delineated full extent (not a second region); given so that the end-point disagreement between methods is explicit\",",
+    "cite": "nominated_regions.json#R1_full (L190)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4 / KEY.md:334 — over-nomination control, opens at 7, −2.5 per nominated region that is a member of the frozen decoy set, floor 0 for this item, no cap on nominations",
+     "verdict": "PASS",
+     "why": "It put forward one region and only one, and avoided every one of the strong-looking but mechanistically irrelevant regions the key keeps in reserve — including two it found, examined and explicitly set aside.",
+     "estimator": "membership test by residue overlap in the P09838 frame against the frozen set (219-243, 130-153, E504, 9-19)"
+    }
+   ],
+   "awarded": 7.0,
+   "arithmetic": "7 (opens at 7) − 2.5 × 0 frozen members nominated = 7.0; floor not reached, no negative item award",
+   "deductions": [],
+   "plain": "It put forward one region and only one, and avoided every one of the strong-looking but mechanistically irrelevant regions the key keeps in reserve — including two it found, examined and explicitly set aside.",
+   "borderline": "A grader could count R1_core and R1_full as two nominations rather than one region at two widths. It changes nothing here since neither is a decoy, but a later run using the same device to bracket a decoy would turn on that reading. Worth noting the near-miss: dx03_could_not_determine.json#CND7_region_count names P09838 241-243 (inside frozen member 219-243) and 4-10 (abutting frozen member 9-19) "
+  }
+ ],
+ "strikes": [],
+ "fabrication_events": [],
+ "reexecution": {
+  "mandatory_commands": [],
+  "sampled_commands": [],
+  "sample_fraction": 0.0,
+  "sampled_after_freeze": true,
+  "results": []
+ },
+ "campaign": {
+  "item_sum": 45.0,
+  "caps_applied": [],
+  "total": 45.0,
+  "reconciles": true,
+  "delta_over_prior": "not computed for this campaign (DX05 not run)",
+  "measured_scope": "DX01 gate and DX02 measured for this run. DX02B adjudicated report-only. DX03 graded for run0 only; runs 1-5 DX03 submissions exist but are NOT graded here. DX04 and DX05 were not measured at all."
+ }
+}

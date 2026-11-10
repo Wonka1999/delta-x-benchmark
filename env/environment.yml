@@ -1,0 +1,74 @@
+# DELTA-X v2 — Tier 1, the light tier.
+#
+# One command, ~5 minutes, no GPU, no multi-GB weights:
+#
+#     conda env create -f env/environment.yml
+#     conda activate delta-x
+#
+# Covers DX03 end to end and the structural-alignment half of DX04.
+# It does NOT cover structure prediction (ESMFold / Protenix) — that is Tier 2,
+# see INSTALL.md.
+#
+# Every pin below was checked against the live channels with `conda search` on
+# 2026-11-10 (linux-64), and the whole set was solved with
+# `conda create --dry-run` on the same day: 65 packages, solve succeeded.
+#
+# Deliberately NOT in this file:
+#   pydca  — its published metadata pins numpy<=1.15.4, scipy==1.3.1,
+#            biopython==1.74, numba==0.46.0, matplotlib==3.0.0, and its CLI
+#            imports `Bio.SubsMat`, which Biopython removed in 1.80. It cannot
+#            share an environment with the modern stack below. INSTALL.md § 1.4
+#            gives a separate, measured recipe.
+#   torch / ESMFold / Protenix — Tier 2 (GPU, multi-GB weights).
+
+name: delta-x
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  # --- interpreter ---------------------------------------------------------
+  # 3.11 matches the reference host (3.11.7). The repo's own harness, grader and
+  # aggregator are stdlib-only and run on any python3; repro/scripts/ need the
+  # numeric stack below.
+  - python=3.11
+
+  # --- alignment and profiles ----------------------------------------------
+  # mafft 7.526 is on conda-forge (bioconda stops at 7.525).
+  - mafft=7.526
+  # hmmer 3.4 is on bioconda and brings the Easel miniapps (esl-reformat et al.),
+  # which the Debian/Ubuntu package does not put on PATH.
+  - hmmer=3.4
+  # hhsuite: only build h503566f_15 (May 2025) depends on an unpinned `python`.
+  # Every older build is pinned to python 3.6-3.9 and will NOT solve against
+  # python=3.11. With python=3.11 fixed the solver selects build _15 on its own.
+  # Note its binaries print "3.1.0" as their own version string — see INSTALL.md.
+  - hhsuite=3.3.0
+
+  # --- structure comparison (no GPU needed) --------------------------------
+  - foldseek=10.941cd33
+  # The bioconda `usalign` package installs 15 programs, among them USalign,
+  # MMalign, TMalign, TMscore, NWalign, pdb2fasta, cif2pdb (checked in the
+  # recipe's build.sh). Do not also install the separate `tmalign` package.
+  - usalign=20241201
+
+  # --- scientific python ---------------------------------------------------
+  - numpy=1.26.4
+  - scipy=1.15
+  - pandas=2.1.4
+  # biopython is left unpinned on purpose: the dry-run solve resolved it to
+  # 1.88, and nothing in this repo needs a specific version. If you intend to
+  # use pydca in THIS environment you cannot — see the note at the top.
+  - biopython
+  - pip
+
+  # --- optional pip block --------------------------------------------------
+  # UNVERIFIED AND UNSUPPORTED IN THIS ENVIRONMENT. Uncommenting it will give
+  # you a pydca whose CLI raises `ModuleNotFoundError: No module named
+  # 'Bio.SubsMat'` against the biopython resolved above. It is kept here only so
+  # the trade-off is visible at the point of installation. Use INSTALL.md § 1.4.
+  #
+  # - pip:
+  #   - --no-deps
+  #   - pydca==1.23

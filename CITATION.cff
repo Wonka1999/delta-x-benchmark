@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+title: "DELTA-X v2: a baseline-subtracted discovery benchmark for scientific agents"
+message: "If you use this benchmark or publish a measurement made with it, please cite it and include your scorecard's measured_scope field."
+type: dataset
+authors:
+  - family-names: He
+    given-names: Wenjia
+    affiliation: King Abdullah University of Science and Technology
+    email: wenjia.he@kaust.edu.sa
+version: "2.0"
+date-released: "2026-11-10"
+license: CC-BY-4.0
+license-url: "https://creativecommons.org/licenses/by/4.0/"
+abstract: >-
+  DELTA-X v2 is a six-task benchmark that measures whether an agent can derive a
+  mechanistic finding rather than retrieve one. It is built on a single pilot case
+  in which two paralogous enzymes of one eukaryotic nucleotidyltransferase family
+  differ in the template-dependence of synthesis in cis. Every scored item is
+  defined so that naming the answer is worth zero and deriving it is worth
+  everything: a number that no recorded command produced is struck before scoring,
+  and a total unaccompanied by a reconciling per-item scorecard may not be
+  published. Weights were set from a measured clean-room baseline rather than
+  argued. The release ships the tasks, the curated data, a driver with adapters for
+  Claude and OpenAI-compatible systems, the answer key, the scoring procedure and
+  its checker, and two measured campaigns with their raw records.
+keywords:
+  - agent evaluation
+  - scientific discovery
+  - benchmark
+  - protein bioinformatics
+  - reproducibility

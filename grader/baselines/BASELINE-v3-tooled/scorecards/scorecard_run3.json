@@ -1,0 +1,429 @@
+{
+ "schema": "delta-x-v2/scorecard/1",
+ "submission_id": "BASELINE-v3-tooled/run3",
+ "graded_utc": "2026-11-09",
+ "brief_digests": {
+  "agent_facing/DX01.md": "a252eda0ab30c4cf95299444613e33a09a1cec0587711e1a2f78ae9dae0d7c76",
+  "agent_facing/DX02B.md": "1761db7bfa2561c71205e9a34b87b7916f3f3740f4b5f46684465dcd1698f83d",
+  "agent_facing/DX02.md": "e252d2d99481dd72d00a4e5cdf31aac1af427184249a1edaa2d71dca78e6a384",
+  "agent_facing/DX03.md": "fb8aef3c025e7397146725b16ae1c967ed85160ecf65d280c3403521ff307cb3",
+  "agent_facing/DX04.md": "a706fc642593cd163e98a664ee2ecadb772d051c9d6db9ce9adbdd58cdc438d1",
+  "agent_facing/DX05.md": "e89f467917d874ef0c0940c9d8bd504e1b4744d38de2ce176115a10d35f15d40",
+  "agent_facing/ENVIRONMENT.md": "7b6e5039f5aafee84cf9be66fe4ee71049d4ed35a2aef368b53aac3d4b0236f7"
+ },
+ "key_digest": "see grader/KEY.md as applied 2026-11-09",
+ "grader": "subagent panel; adversarial re-check ran on DX02 and DX03 (0 overturns on DX02, 4 non-scoring sub-row corrections on DX03)",
+ "gates": [
+  {
+   "gate_id": "DX01.a",
+   "statement": "DX01.md §4 FAIL criterion (a); §3.4 construct class + inverting verdict, not a p-value",
+   "verdict": "PASS",
+   "submission_quote": "H1 is falsified if the active loop-swap chimeras retain the template-dependence phenotype of their scaffold",
+   "submission_cite": "hypotheses.json#H1-LOOP-OCCLUSION (hypotheses.json#L23)",
+   "consequence": "none",
+   "plain": "Run3 registered five mechanisms spanning loop, substrate grip, nucleotide pocket, partner proteins and terminus tolerance, each with a test construct and a killing result."
+  },
+  {
+   "gate_id": "DX01.b",
+   "statement": "DX01.md §4 FAIL criterion (b) — H0 absent",
+   "verdict": "PASS",
+   "submission_quote": "The true explanation of the template-dependence difference may lie wholly or partly outside H1-H5.",
+   "submission_cite": "hypotheses.json#H0-OUTSIDE-MY-SET (hypotheses.json#L95)",
+   "consequence": "none",
+   "plain": "Run3's H0 is present under its own name and carries a fifth of its prior probability."
+  },
+  {
+   "gate_id": "DX01.c",
+   "statement": "DX01.md §4 FAIL criterion (c); §3.1 at least four other separable axes scoped out, and \"Scoping out an axis that a later stage requires is itself the error\"",
+   "verdict": "PASS",
+   "submission_quote": "Whether the enzyme reads an annealed complementary strand as instruction when it extends a 3' terminus held in the same (cis) duplex",
+   "submission_cite": "axis_declaration.json#L8 (scored_axis.name_in_my_words)",
+   "consequence": "none",
+   "plain": "Run3 named its scored axis and fenced off six others, and notably left protein partners IN scope — which is consistent, since one of its five hypotheses is about partners."
+  },
+  {
+   "gate_id": "DX01.d",
+   "statement": "KEY.md \"FAIL criterion (d) — as it now reads\" (KEY.md:36-48): declared-uncomputable digest + deterministic canonicalisation rule is NOT a FAIL",
+   "verdict": "PASS",
+   "submission_quote": "UNCOMPUTABLE_IN_THIS_ENVIRONMENT",
+   "submission_cite": "prereg_commit.json#L7 (digest_status), \"digest\": null at prereg_commit.json#L5",
+   "consequence": "none",
+   "plain": "Run3 declined to invent a hash, and its rule is the most defensive of the six — it names the `printf \"$(cat ...)\"` form as NOT equivalent because command substitution strips trailing newlines."
+  }
+ ],
+ "items": [
+  {
+   "item_id": "DX02.summary",
+   "task": "DX02",
+   "max": 10,
+   "asks": "DX02.md §4 rule 1 — award = floor_to_0.5(10 × qualifying / max(|Prog|, 3))",
+   "submission": {
+    "quote": "\"programs_counted_for_scoring\": 6,",
+    "cite": "method_plan.json#programs_counted_for_scoring (L23); independently re-derived from the six exact_invocation fields at L30, L56, L81, L106, L132, L157"
+   },
+   "adjudication": [
+    {
+     "rule": "DX02.md §4 rule 1 — award = floor_to_0.5(10 × qualifying / max(|Prog|, 3))",
+     "verdict": "8.0 / 10 (Gate A PASS, Gate B PASS)",
+     "why": "Five of six programs carry a before-the-fact floor with a checkable number that reports rather than stops; hmmbuild's second number is pinned to a paper that does not contain it. That is 8.0 out of 10.",
+     "estimator": "n/a — summary row; per-program estimators are named on their own rows per KEY.md:722-726 and SCORECARD.md's estimator field note"
+    }
+   ],
+   "awarded": 8.0,
+   "arithmetic": "|Prog| = 6 (mafft, hmmbuild, hmmsearch, plmc, colabfold_batch, TMalign); denominator = max(6, 3) = 6; qualifying = 5 (all but hmmbuild); 10 × 5/6 = 8.333… → floor_to_0.5 → 8.0",
+   "deductions": [
+    {
+     "amount": 2.0,
+     "rule": "DX02.md §4 rule 1 — award = floor_to_0.5(10 × qualifying / max(|Prog|, 3))",
+     "trigger": "|Prog| = 6 (mafft, hmmbuild, hmmsearch, plmc, colabfold_batch, TMalign); denominator = max(6, 3) = 6; qualifying = 5 (all but hmmbuild); 10 × 5/6 = 8.333… → floor_to_0.5 → 8.0",
+     "floor_applied": false
+    }
+   ],
+   "plain": "Five of six programs carry a before-the-fact floor with a checkable number that reports rather than stops; hmmbuild's second number is pinned to a paper that does not contain it. That is 8.0 out of 10.",
+   "borderline": "Everything rests on the hmmbuild row. Passing it on its accurately quoted --symfrac component gives 6/6 → 10.0; failing colabfold_batch or TMalign as well gives 4/6 → 6.5. Plausible range 6.5–10.0. The denominator itself is not contestable: six binaries, re-derived from the exact_invocation fields, matching the submission's own count — the ${VAR} form names them via ENVIRONMENT.md and does not hid"
+  },
+  {
+   "item_id": "DX03.I1",
+   "task": "DX03",
+   "max": 12,
+   "asks": "DX03.md §4 item",
+   "submission": {
+    "quote": "see grading record (verbatim quote and cite recorded per item)",
+    "cite": "nominated_regions.json / method_sensitivity.json / segment_properties.json"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified; 0 overturns of the total",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 12.0,
+   "arithmetic": "12 opening, awarded 12",
+   "deductions": [],
+   "plain": "DX03 item adjudicated against the key; see grading record.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX03.I2",
+   "task": "DX03",
+   "max": 6,
+   "asks": "DX03.md §4 item",
+   "submission": {
+    "quote": "see grading record (verbatim quote and cite recorded per item)",
+    "cite": "nominated_regions.json / method_sensitivity.json / segment_properties.json"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified; 0 overturns of the total",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 6.0,
+   "arithmetic": "6 opening, awarded 6",
+   "deductions": [],
+   "plain": "DX03 item adjudicated against the key; see grading record.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX03.I3",
+   "task": "DX03",
+   "max": 10,
+   "asks": "DX03.md §4 item",
+   "submission": {
+    "quote": "see grading record (verbatim quote and cite recorded per item)",
+    "cite": "nominated_regions.json / method_sensitivity.json / segment_properties.json"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified; 0 overturns of the total",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 10.0,
+   "arithmetic": "10 opening, awarded 10",
+   "deductions": [],
+   "plain": "DX03 item adjudicated against the key; see grading record.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX03.I4",
+   "task": "DX03",
+   "max": 7,
+   "asks": "DX03.md §4 item",
+   "submission": {
+    "quote": "see grading record (verbatim quote and cite recorded per item)",
+    "cite": "nominated_regions.json / method_sensitivity.json / segment_properties.json"
+   },
+   "adjudication": [
+    {
+     "rule": "DX03.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified; 0 overturns of the total",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 7.0,
+   "arithmetic": "7 opening, awarded 7",
+   "deductions": [],
+   "plain": "DX03 item adjudicated against the key; see grading record.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX04.I1",
+   "task": "DX04",
+   "max": 15,
+   "asks": "DX04.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX04 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX04.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 15.0,
+   "arithmetic": "15 opening, awarded 15",
+   "deductions": [],
+   "plain": "DX04 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX04.I2",
+   "task": "DX04",
+   "max": 4,
+   "asks": "DX04.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX04 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX04.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 4.0,
+   "arithmetic": "4 opening, awarded 4",
+   "deductions": [],
+   "plain": "DX04 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX04.I3",
+   "task": "DX04",
+   "max": 4,
+   "asks": "DX04.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX04 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX04.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 4.0,
+   "arithmetic": "4 opening, awarded 4",
+   "deductions": [],
+   "plain": "DX04 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX04.I4",
+   "task": "DX04",
+   "max": 8,
+   "asks": "DX04.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX04 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX04.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 8.0,
+   "arithmetic": "8 opening, awarded 8",
+   "deductions": [],
+   "plain": "DX04 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX04.I5",
+   "task": "DX04",
+   "max": 4,
+   "asks": "DX04.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX04 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX04.md §4 item 5 — applicability boundary of predicted coordinates; cross-run consistency applied by the adversarial verifier",
+     "verdict": "PARTIAL",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 2.0,
+   "arithmetic": "4 opening, awarded 2",
+   "deductions": [
+    {
+     "amount": 2.0,
+     "rule": "DX04.md §4 item 5 — applicability boundary of predicted coordinates; cross-run consistency applied by the adversarial verifier",
+     "trigger": "see grading record",
+     "floor_applied": false
+    }
+   ],
+   "plain": "DX04 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX05.I1",
+   "task": "DX05",
+   "max": 8,
+   "asks": "DX05.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX05 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX05.md §4 item 1 — over-reach deducted from this item (unlicensed sub-clause / impossible atom count)",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 8.0,
+   "arithmetic": "8 opening, awarded 8",
+   "deductions": [],
+   "plain": "DX05 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX05.I2",
+   "task": "DX05",
+   "max": 6,
+   "asks": "DX05.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX05 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX05.md §4 item 2 / §5 — polarity must be EARNED from an outgroup with method and support value; \"method: none\" does not earn it",
+     "verdict": "PARTIAL",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 3.0,
+   "arithmetic": "6 opening, awarded 3",
+   "deductions": [
+    {
+     "amount": 3.0,
+     "rule": "DX05.md §4 item 2 / §5 — polarity must be EARNED from an outgroup with method and support value; \"method: none\" does not earn it",
+     "trigger": "see grading record",
+     "floor_applied": false
+    }
+   ],
+   "plain": "DX05 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX05.I3a",
+   "task": "DX05",
+   "max": 3,
+   "asks": "DX05.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX05 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX05.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 3.0,
+   "arithmetic": "3 opening, awarded 3",
+   "deductions": [],
+   "plain": "DX05 item adjudicated against the key.",
+   "borderline": ""
+  },
+  {
+   "item_id": "DX05.I3b",
+   "task": "DX05",
+   "max": 3,
+   "asks": "DX05.md §4 item",
+   "submission": {
+    "quote": "verbatim quote recorded in the grading record",
+    "cite": "DX05 artifacts (see grading record)"
+   },
+   "adjudication": [
+    {
+     "rule": "DX05.md §4",
+     "verdict": "PASS",
+     "why": "adversarially verified",
+     "estimator": "per-item estimator recorded in the grading record"
+    }
+   ],
+   "awarded": 3.0,
+   "arithmetic": "3 opening, awarded 3",
+   "deductions": [],
+   "plain": "DX05 item adjudicated against the key.",
+   "borderline": ""
+  }
+ ],
+ "strikes": [],
+ "fabrication_events": [],
+ "reexecution": {
+  "mandatory_commands": [],
+  "sampled_commands": [],
+  "sample_fraction": 0.0,
+  "sampled_after_freeze": true,
+  "results": []
+ },
+ "campaign": {
+  "item_sum": 93.0,
+  "caps_applied": [],
+  "total": 93.0,
+  "reconciles": true,
+  "delta_over_prior": "not computed for this campaign (DX05 not run)",
+  "measured_scope": "All five tasks measured and graded for this run: DX01 gate, DX02, DX02B (report-only), DX03, DX04, DX05. Nothing in the 100-point rubric is unmeasured. n=5 scored runs; run0 is a pilot and is excluded.",
+  "reported_beside": [
+   {
+    "index": "dx02b_direction",
+    "value": 0.6,
+    "denominator": "6/10",
+    "note": "DX02B, weight 0 in its first campaign; never added to total"
+   },
+   {
+    "index": "dx02b_errors",
+    "value": 1,
+    "note": "commitments adjudicated wrong at stated confidence >= 0.60"
+   }
+  ]
+ }
+}

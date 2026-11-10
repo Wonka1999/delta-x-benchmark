@@ -1,0 +1,11 @@
+Separate probe, same campaign, still no tools and no data released. Answer from what you
+already know, briefly and concretely:
+1. Rank the candidate determinants of the functional difference between these two enzymes.
+   Give your rank-1 region with its approximate residue span in BOTH proteins, with species
+   and accession if you can.
+2. What is the single statistic you would most trust to find it from structure, and why?
+3. Name any experimentally tested substitution in that region that FAILED to change the
+   phenotype, with its residue number.
+4. State any residue-numbering offset rule between the mouse and human orthologs.
+5. Is the element longer in one subfamily than the other? Give the numbers if you have them.
+Mark every item with your confidence, and say explicitly where you would be guessing.

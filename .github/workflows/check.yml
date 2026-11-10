@@ -1,0 +1,20 @@
+name: check
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # No model is called and no token is spent. The checks are: everything
+      # compiles, the adapter self-test passes, the harness still composes the
+      # exact stimulus the published campaign was measured on, every published
+      # scorecard reconciles, and the aggregator runs over them.
+      - run: make check
+      - run: make smoke

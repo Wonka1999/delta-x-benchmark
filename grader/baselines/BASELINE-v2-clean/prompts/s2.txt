@@ -1,0 +1,81 @@
+This is task 2 of 5, continuing the same campaign. Tool use remains blocked. Produce every
+required artifact INLINE as fenced ```json blocks, each preceded by a line giving the filename.
+
+--- BEGIN TASK BRIEF ---
+# DELTA-X v2 — DX02: Method Pre-Registration
+
+**Capability under test** — whether the agent can design an analysis that could *fail*:
+declaring, in advance, the threshold each tool must clear to be trusted, the null each
+statistic must beat, and the result that would make it abandon the tool.
+
+## 1. Objective
+
+Turn the hypotheses registered in DX01 into an executable analysis plan in which every
+proposed measurement carries a pre-declared adequacy check and a pre-declared abandon
+condition.
+
+## 2. Inputs
+
+**Given**
+- Your own DX01 registration.
+- The inventory of what DX03/DX04 will supply: two subfamily FASTA sets of stated size,
+  seven reference sequences, and the tool list (MAFFT, HMMER, optionally a coevolution
+  package, a structure predictor, a structural aligner).
+- The sequence counts you will actually receive, stated up front: **322** sequences in one
+  subfamily, **165** in the other, species-unique, 451–620 aa.
+
+**Withheld**
+- The sequences themselves. No tool may be executed in this stage.
+
+## 3. Required outputs
+
+1. `method_plan.json` — one record per proposed analysis step, each containing:
+   - `question` — which DX01 hypothesis this step discriminates, by its identifier.
+   - `tool` and `exact_invocation` — the command you intend to run, with flags.
+   - `statistic` — what number the step produces.
+   - `null` — what you will compare that number against. A null that is a reshuffle of the
+     same two groups is **not** sufficient; state a null that could plausibly produce your
+     effect by chance.
+   - `adequacy_check` — a check on whether the **input** can support the method at all,
+     with a **numeric threshold stated in advance** and a published or derived source for
+     that threshold.
+   - `abandon_condition` — the result that makes you drop this step and report a negative.
+   - `expected_result_if_H_true` and `expected_result_if_H_false`.
+
+2. `granularity_declaration.json`
+   - For each step: the finest spatial granularity at which its output may be reported —
+     residue, region, domain, or none — **and the measurement that will establish it**.
+   - You may not declare residue granularity without naming the test that would demonstrate
+     one position is separable from the position next to it.
+
+3. `power_budget.json`
+   - For every sequence-statistical step, the effective sample size you expect, how you will
+     measure it, and what you will do if it comes in below your threshold.
+
+## 4. Evaluation — 20 points
+
+| Points | Item |
+|---|---|
+| 8 | Every proposed tool carries an adequacy check with a numeric threshold **declared before execution** and sourced. Partial credit is per-tool. |
+| 6 | Every differential statistic carries a null that is not a label reshuffle. Full credit requires at least one **within-subfamily split-half** null — comparing two halves of the *same* subfamily to calibrate how much two groups differ for no functional reason. |
+| 6 | Abandon conditions are stated and are *reachable*. A condition that no possible result triggers scores zero. |
+
+**Not scored:** the length, breadth or literature coverage of the plan. Plan breadth is a
+saturated capability — closed-book models with no tools produce fifteen-to-twenty-step plans
+naming the same methods. Only the thresholds, the nulls and the abandon conditions carry points.
+
+## 5. Scientific constraints
+
+- A plan step whose adequacy check cannot be computed before the main analysis is not an
+  adequacy check.
+- Proposing a method and reporting its negative result is a **success**, not a failure, and
+  is scored as such in DX03/DX04.
+- Do not propose a method whose output you have already declared you cannot interpret.
+- Thresholds must be sourced: "sufficient depth" is not a threshold; a number with a citation
+  or a derivation is.
+
+## 6. Success condition
+
+A plan under which an honest execution could return "this does not work, here is the number
+that says so" for any step — and under which that outcome would still be scored.
+--- END TASK BRIEF ---

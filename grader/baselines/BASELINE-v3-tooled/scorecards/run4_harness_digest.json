@@ -1,0 +1,13 @@
+{
+ "run": "run4",
+ "declared_digest": null,
+ "order_source": "canonicalisation_rule.file_order",
+ "order": [
+  "axis_declaration.json",
+  "sealed_prior.json",
+  "recognition_declaration.json",
+  "hypotheses.json"
+ ],
+ "missing": [],
+ "commitment_digest": "22d6279a68144473056d5b8c44c255a15de449b87ca126adfbf510889c2475d5"
+}

@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.make-tmp/
+.ipynb_checkpoints/
+.DS_Store
+*.swp
+
+# Clean-room run directories never belong in the repository: the driver refuses
+# to stage one here, and a committed run would also commit the transcript.
+delta-x-runs/
+ENVIRONMENT.md

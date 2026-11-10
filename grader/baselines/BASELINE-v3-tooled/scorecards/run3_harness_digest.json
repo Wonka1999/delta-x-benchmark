@@ -1,0 +1,13 @@
+{
+ "run": "run3",
+ "declared_digest": null,
+ "order_source": "committed_files_in_order",
+ "order": [
+  "axis_declaration.json",
+  "hypotheses.json",
+  "recognition_declaration.json",
+  "sealed_prior.json"
+ ],
+ "missing": [],
+ "commitment_digest": "4e9aa5b023e55708d012e14280f539f52c7c35365f230db6f82ca7e001739e42"
+}

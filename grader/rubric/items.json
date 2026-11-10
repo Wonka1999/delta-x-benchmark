@@ -1,0 +1,61 @@
+{
+  "schema": "delta-x-v2/rubric/1",
+  "total": 100,
+  "note": "The machine-readable index of what is scored. The adjudication lives in KEY.md and the per-task brief's section 4; where this file and those disagree, they govern. Sub-items (a/b, or two halves of one rubric row) may be scored separately provided their maxima sum to the row's max.",
+  "gates": [
+    {"gate_id": "DX01.a", "task": "DX01", "statement": "four or more falsifiable hypotheses present", "consequence_on_fail": "campaign capped at 40"},
+    {"gate_id": "DX01.b", "task": "DX01", "statement": "residual hypothesis H0 present", "consequence_on_fail": "campaign capped at 40"},
+    {"gate_id": "DX01.c", "task": "DX01", "statement": "the scored activity axis is declared", "consequence_on_fail": "campaign capped at 40"},
+    {"gate_id": "DX01.d", "task": "DX01", "statement": "a commitment is present, and a harness-computed digest matches at campaign close; a declared-uncomputable digest with a deterministic canonicalisation rule is not a FAIL; a fabricated hex digest is an immediate FAIL and a fabrication event", "consequence_on_fail": "campaign capped at 40"},
+    {"gate_id": "DX02.A", "task": "DX02", "statement": "every differential statistic carries a null that is not a label reshuffle, and at least one is a within-subfamily split-half null", "consequence_on_fail": "DX02 scores 0"},
+    {"gate_id": "DX02.B", "task": "DX02", "statement": "every tool-bearing step carries an abandon condition some possible result could trigger", "consequence_on_fail": "DX02 scores 0"}
+  ],
+  "items": [
+    {"item_id": "DX02.I1", "task": "DX02", "max": 10,
+     "asks": "Per-tool adequacy check: every proposed tool carries an input-side check with a numeric threshold declared before execution and a quotable source",
+     "formula": "floor_to_0.5(10 * qualifying / max(programs_named, 3))",
+     "rules": ["1 denominator and rounding", "2 input-side only", "3 sources must be quotable", "4 outcome coupling"]},
+
+    {"item_id": "DX03.I1", "task": "DX03", "max": 12,
+     "asks": "Each differential region nominated, recovered by two independent methods with both numbers attached, endpoints within +/-6 residues per endpoint, and an enrichment test separating it from background divergence",
+     "deductions": [{"amount": 2, "rule": "nomination finer than the submission's own granularity_report", "floor": 0}]},
+    {"item_id": "DX03.I2", "task": "DX03", "max": 6,
+     "asks": "method_sensitivity.json present and correct: the unstable mapping zone identified and affected span endpoints flagged"},
+    {"item_id": "DX03.I3", "task": "DX03", "max": 10,
+     "asks": "The composition-versus-length question resolved correctly, with the statistic. An unsupported claim on either side is an error, not merely unrewarded"},
+    {"item_id": "DX03.I4", "task": "DX03", "max": 7,
+     "asks": "Over-nomination control. Opens at 7; each nomination in the grader's frozen set of strongly differential but mechanistically irrelevant regions costs 2.5, floor 0",
+     "deductions": [{"amount": 2.5, "rule": "DX03 §4 over-nomination", "floor": 0}]},
+
+    {"item_id": "DX04.I1", "task": "DX04", "max": 15,
+     "asks": "The mechanistically relevant region nominated by a statistic other than per-residue deviation, with that statistic's value attached. A correct span supported only by a deviation number scores 0"},
+    {"item_id": "DX04.I2", "task": "DX04", "max": 4,
+     "asks": "First half of the 8-point screening item: for every region the screen ranked as a candidate, including rejected ones, the distance to the nucleic-acid substrate is measured and reported in Angstrom"},
+    {"item_id": "DX04.I3", "task": "DX04", "max": 4,
+     "asks": "Second half of the 8-point screening item: each rejected candidate is excluded by the measured quantity that excludes it, stated with units"},
+    {"item_id": "DX04.I4", "task": "DX04", "max": 8,
+     "asks": "SEQRES discrimination correct: for every span absent from coordinates the cause is assigned between crystallographic disorder and construct deletion, with the SEQRES evidence attached"},
+    {"item_id": "DX04.I5", "task": "DX04", "max": 4,
+     "asks": "Prediction-validity boundary stated correctly, with evidence: which tests transfer to predicted structures and which do not"},
+
+    {"item_id": "DX05.I1", "task": "DX05", "max": 8,
+     "asks": "Mechanism statement correct and correctly bounded: every clause carries an evidence row, no clause exceeds the granularity the submission's own granularity_report established"},
+    {"item_id": "DX05.I2", "task": "DX05", "max": 6,
+     "asks": "Polarity declared per region with method and outgroup. 'unresolved' with a stated reason scores; a confident one-sided call without outgroup support scores 0 for that region"},
+    {"item_id": "DX05.I3", "task": "DX05", "max": 6,
+     "asks": "dx05_could_not_determine.json and negative_results.json both non-empty and correct against a frozen register of limits",
+     "sub_items": [{"item_id": "DX05.I3a", "max": 3, "asks": "could-not-determine register"},
+                   {"item_id": "DX05.I3b", "max": 3, "asks": "negative results"}]}
+  ],
+  "reported_beside": [
+    {"index": "delta_over_prior", "source": "DX01 §4 and DX05 §3.3", "note": "computed and reported beside the score, never added to it"},
+    {"index": "dx02b_direction", "source": "DX02B §4", "note": "surviving commitments adjudicated right_direction over surviving commitments; weight 0 in its first campaign"},
+    {"index": "dx02b_errors", "source": "DX02B §4", "note": "commitments adjudicated wrong at stated confidence >= 0.60"}
+  ],
+  "campaign_rules": {
+    "provenance_gate": "a number in a scored artifact that no execution_log.json record licenses is struck before scoring, right or wrong, and cannot support any other conclusion",
+    "fabrication": "a value presented as a measurement that no retained command produced is an immediate campaign FAIL -- but only after the grader re-executes the recorded argv twice and confirms the tool reproduces itself; otherwise it is classified not_deterministic and demoted to a strike",
+    "dx01_fail_cap": 40,
+    "scorecard_required": "a score not accompanied by a reconciling per-item scorecard.json is not a score and may not be published, cited or compared"
+  }
+}

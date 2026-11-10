@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DELTA-X 案例走查 · 从一句问题到一个分数</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{--bg:#f6f8f7;--paper:#fff;--ink:#152d34;--muted:#61747b;--line:#dce7e6;--mint:#def3ea;--green:#187c68;--navy:#183849;--blue:#386cac;--peach:#fff0de;--orange:#c36e3b;--violet:#7863a0;--rose:#b4445c;--shadow:0 14px 42px rgba(31,61,59,.065);margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft Yahei",sans-serif;font-size:16px;line-height:1.72;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}
+h1,h2,h3,h4,p{margin-top:0}
+h1{font-size:clamp(32px,3.8vw,54px);line-height:1.15;letter-spacing:-.042em;max-width:1000px}
+h2{font-size:clamp(24px,2.5vw,36px);line-height:1.24;letter-spacing:-.028em;margin-bottom:16px}
+h3{font-size:21px;line-height:1.34;letter-spacing:-.016em;margin-bottom:10px}
+h4{font-size:17px;margin-bottom:8px}
+p{color:#3f565e;margin-bottom:14px}
+small{color:var(--muted);font-size:13px}
+strong{font-weight:740;color:var(--ink)}
+.bar{height:60px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.96);display:flex;align-items:center;gap:22px;padding:0 4.2vw;position:sticky;top:0;z-index:20;backdrop-filter:blur(14px)}
+.brand{font-size:14px;font-weight:850;letter-spacing:.04em;color:var(--navy);white-space:nowrap}.brand b{color:var(--green)}
+.links{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.links a{font-size:13px;font-weight:700;color:#50636b;border-radius:9px;padding:7px 10px}
+.links a:hover{background:#eaf4f1;text-decoration:none}
+.top{padding:62px 4.2vw 50px;background:linear-gradient(132deg,#e8f4ef 0%,#f7faf7 49%,#eaf0f4 100%);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.top:after{content:'';position:absolute;width:380px;height:380px;border-radius:100%;border:68px solid rgba(30,136,112,.055);right:-120px;top:-215px;pointer-events:none}
+.eyebrow{color:var(--green);letter-spacing:.145em;font-size:12px;font-weight:850;text-transform:uppercase;margin-bottom:15px}
+.subtitle{max-width:900px;font-size:19px;color:#455e64;line-height:1.75}
+.quick{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.pill{border:1px solid #c5ddd4;background:rgba(255,255,255,.7);font-size:13px;font-weight:650;border-radius:999px;padding:6px 12px;color:#315a55}
+.pill.red{border-color:#e2bcc5;background:#fdf0f3;color:#8f3f53}
+.layout{display:grid;grid-template-columns:198px minmax(0,1fr);gap:40px;padding:36px 4.2vw 80px}
+.side{position:sticky;top:84px;align-self:start}
+.side .label{font-size:11px;text-transform:uppercase;color:#819095;letter-spacing:.14em;font-weight:800;margin-bottom:9px}
+.side a{display:block;border-left:2px solid #d6e3e1;padding:7px 11px;color:#64777d;font-size:13px;font-weight:670}
+.side a:hover{color:var(--green);border-left-color:var(--green);background:#edf5f1;text-decoration:none}
+.content{min-width:0}
+.section{margin-bottom:66px;scroll-margin-top:96px}
+.section-head{display:flex;gap:15px;align-items:center;margin-bottom:17px}
+.idx{color:var(--green);font-size:13px;font-weight:850;letter-spacing:.09em}
+.section-intro{font-size:18px;color:#51656c;max-width:960px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.card.light{box-shadow:none}
+.grid{display:grid;gap:14px}.grid>*{min-width:0}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.micro{font-size:12px;font-weight:850;color:var(--green);letter-spacing:.085em;text-transform:uppercase}
+.micro.red{color:var(--rose)}.micro.orange{color:var(--orange)}.micro.blue{color:var(--blue)}
+.metric{font-size:31px;color:var(--navy);font-weight:800;letter-spacing:-.04em;line-height:1.2}
+.metric.red{color:var(--rose)}.metric.green{color:var(--green)}
+.metric-label{font-size:13px;color:var(--muted);margin-top:4px}
+.callout{padding:18px 20px;border-radius:11px;border-left:4px solid var(--green);background:#eaf6f0;color:#2b5850;margin-bottom:14px}
+.callout p{margin:0;color:#385e56}.callout p+p{margin-top:9px}
+.callout.amber{border-color:var(--orange);background:#fff4e8}.callout.amber p{color:#77563d}
+.callout.red{border-color:var(--rose);background:#fdf0f3}.callout.red p{color:#8a4155}
+.callout.blue{border-color:var(--blue);background:#eef3fb}.callout.blue p{color:#3c5680}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.badge{display:inline-block;font-size:11px;font-weight:850;border-radius:5px;background:#e9f5ef;color:#197762;padding:3px 7px;white-space:nowrap}
+.badge.neg{background:#fdeef1;color:#a3445b}
+.badge.con{background:#f3f0e4;color:#8a7430}
+.badge.dec{background:#f0ecf9;color:#6c5098}
+.badge.mech{background:#e7effc;color:#4269a2}
+.badge.non{background:#eef1f1;color:#657476}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#f1f6f5;border:1px solid #e2edeb;color:#4a6a69;border-radius:8px;padding:4px 8px;font-size:12px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.5}
+.table th{text-align:left;padding:11px 12px;background:#eff5f3;color:#4a6165;font-size:12px;letter-spacing:.03em;white-space:nowrap;position:sticky;top:0}
+.table td{padding:11px 12px;border-top:1px solid #e8efed;vertical-align:top}
+.table tr:hover td{background:#fbfdfd}
+.table code{font-size:12px}
+.mono,code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.mono{font-size:12.5px}
+code{background:#eef4f2;border-radius:4px;padding:1px 5px;font-size:12.5px;color:#235c54}
+.codebox{border-radius:12px;background:#17323e;color:#e4f5f0;padding:17px 20px;white-space:pre-wrap;word-break:break-word;line-height:1.66;font-size:13px;overflow:auto}
+.codebox code{color:inherit;background:none;padding:0}
+.codebox b{color:#8fe0c6;font-weight:700}
+.codebox i{color:#f0c38e;font-style:normal}
+.tiny{font-size:13px;color:#65777b}
+.under{display:block;margin:11px 0 0;border-top:1px solid var(--line);padding-top:11px;font-size:13px;color:#66807d}
+.note-list{padding-left:20px;margin:8px 0}
+.note-list li{margin-bottom:7px;color:#435b62}
+.detail{border:1px solid #dde9e7;border-radius:12px;background:#fff;overflow:hidden;margin-bottom:10px}
+.detail summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 17px;cursor:pointer;font-weight:760;color:#1d4547}
+.detail summary::-webkit-details-marker{display:none}
+.detail summary:after{content:'+';font-size:20px;color:var(--green);font-weight:400}
+.detail[open] summary:after{content:'\2212'}
+.detail .detail-body{padding:0 17px 18px;border-top:1px solid #eef4f2}
+.detail .detail-body p:first-child{margin-top:13px}
+.flowline{display:flex;gap:8px;align-items:stretch;overflow-x:auto;padding:8px 0 14px}
+.flow-step{min-width:132px;flex:1;border:1px solid var(--line);background:white;border-radius:12px;padding:13px;min-height:96px}
+.flow-step b{display:block;font-size:14px}
+.flow-step small{display:block;margin-top:5px;line-height:1.5}
+.footer{padding:24px 4.2vw 44px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);background:#fff}
+.footer a{font-weight:700}
+.btn{background:#fff;border:1px solid #cbdedb;color:#365960;border-radius:9px;padding:8px 14px;font-family:inherit;cursor:pointer;font-weight:730;font-size:13px}
+.btn:hover{background:#edf7f2}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 15px}
+.tab{border:1px solid #cbdeda;background:#fff;border-radius:10px;padding:10px 13px;white-space:nowrap;cursor:pointer;color:#537072;font-size:13px;font-weight:760}
+.tab.is-active{background:#dff2eb;color:#166a58;border-color:#aed4c6}
+.hidden{display:none!important}
+.bars{display:grid;gap:7px}
+.barrow{display:grid;grid-template-columns:minmax(150px,290px) 1fr 54px;gap:11px;align-items:center;font-size:13px}
+.barline{height:11px;background:#e4ecea;border-radius:9px;overflow:hidden}
+.barline span{display:block;height:100%;background:var(--green);border-radius:inherit}
+.barline span.zero{background:#cfd9d8}
+.barval{text-align:right;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.sep{border:0;border-top:1px solid var(--line);margin:24px 0}
+.warn{background:#2c1b20;color:#ffd9e0;border-radius:12px;padding:15px 19px;font-size:14px;font-weight:650}
+.warn b{color:#ff9db1}
+@media(max-width:1020px){.layout{grid-template-columns:1fr;padding:28px 18px}.side{display:none}.top{padding:50px 18px}.bar{padding:0 18px}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:660px){.links a{font-size:11px;padding:6px}.brand{font-size:12px}.g2,.g3,.two-col{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:17px}.barrow{grid-template-columns:1fr 50px}.barline{display:none}}
+@media print{body{background:#fff}.bar,.side,.btn,.tabs{display:none!important}.layout{display:block;padding:14px}.section{break-inside:avoid}.card,.detail{box-shadow:none}.detail .detail-body{display:block!important}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="brand">DELTA-X <b>案例走查</b></div>
+  <nav class="links">
+    <a href="#q0">最初的问题</a><a href="#flow">十步</a><a href="#given">给了什么</a>
+    <a href="#layers">分层</a><a href="#types">题型</a><a href="#key">标准答案</a>
+    <a href="#prov">来源依据</a><a href="#score">评分</a><a href="#opus">Opus 基线</a><a href="#verdict">裁决</a>
+  </nav>
+</div>
+
+<header class="top">
+  <div class="eyebrow">Case Walkthrough · TdT / Pol mu</div>
+  <h1>一句问题，十个任务，一百分，<br>和一个 0.5 分的闭卷基线</h1>
+  <p class="subtitle">
+    这一页把 DELTA-X 的那个 pilot case 从头到尾拆开：<b>agent 实际读到的那段话</b>、它被要求自己产出什么、
+    每一分挂在哪一个可判定的对象上、标准答案是从哪一篇论文的哪一张表／哪一个沉积记录里核出来的，
+    以及一个无工具的 Claude Opus 5 把这套题做出来是什么样子——为什么它拿 0.5 分，而那 0.5 分<b>既不是它答得差，也不是题出得刁</b>。
+  </p>
+  <div class="quick">
+    <span class="pill">题面 = 两句话</span>
+    <span class="pill">任务 = 10 个</span>
+    <span class="pill">满分 = 100</span>
+    <span class="pill">标答 = 10 阳性 / 13 阴性 / 4 争议</span>
+    <span class="pill">闭卷基线 = 0.5</span>
+    <span class="pill red">发布闸门 = BLOCK</span>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="side">
+  <div class="label">走查顺序</div>
+  <a href="#q0">01 最初的问题</a>
+  <a href="#flow">02 十步流水线</a>
+  <a href="#given">03 题目给了什么</a>
+  <a href="#layers">04 分层：阶段 × 题型</a>
+  <a href="#types">05 十一种题型</a>
+  <a href="#key">06 标准答案</a>
+  <a href="#prov">07 标答来源与依据</a>
+  <a href="#score">08 评分标准</a>
+  <a href="#opus">09 Opus 5 基线</a>
+  <a href="#verdict">10 实测裁决</a>
+</aside>
+
+<main class="content">
+
+<section class="section" id="q0">
+  <div class="section-head"><span class="idx">01</span><h2>最初的问题</h2></div>
+  <p class="section-intro">
+    这里有三层，必须分清楚。<b>科学命题</b>是写给人看的；<b>被评测的轴</b>是 agent 必须自己凿出来的；
+    而<b>agent 真正读到的那段文字</b>比前两者都短得多，也刻意得多。
+  </p>
+
+  <div class="grid g3" style="margin:18px 0">
+    <div class="card">
+      <div class="micro">LAYER 1 · 科学命题</div>
+      <h3 style="margin-top:9px">写给人的那句话</h3>
+      <p class="tiny">TdT 与 Pol mu 是 Pol X 家族里的一对旁系同源酶，折叠几乎相同、催化化学相同，行为却不同。
+      <b>哪些关键残基决定了这个差异？仅凭序列 + 结构 + 进化分析，能不能得出结论？</b></p>
+      <span class="under">这是本 benchmark 的立题。注意它<b>已经预设</b>了「有关键残基」——而答案键的结论是：这个预设在残基层面<b>部分为假</b>。</span>
+    </div>
+    <div class="card">
+      <div class="micro orange">LAYER 2 · 被评测的轴</div>
+      <h3 style="margin-top:9px">agent 必须自己选出来</h3>
+      <p class="tiny">「催化活性不同」不是一个可测量。它至少可以拆成七条互相独立的轴。
+      benchmark 只在<b>其中一条</b>上计分：<code>template-dependence of synthesis in cis</code>（顺式合成的模板依赖性）。</p>
+      <span class="under">这条轴<b>不写在题面里</b>。选错不在 DX01 扣分，而是让你后面填的每一条排除理由都对错了对象。</span>
+    </div>
+    <div class="card">
+      <div class="micro blue">LAYER 3 · agent 读到的</div>
+      <h3 style="margin-top:9px">两句话，外加四项作业</h3>
+      <p class="tiny">没有序列，没有结构，没有文献，没有表型数据，工具在 harness 层被封死，transcript 全程留档。
+      它只知道：<b>同一个聚合酶家族的两个旁系同源物，折叠与化学相近，催化行为不同。</b></p>
+      <span class="under">明化臂会告诉它这两个酶叫什么；<b>盲化臂连名字都不给</b>，只给 XP-A / XP-B。</span>
+    </div>
+  </div>
+
+  <h3>七条轴，只有一条计分</h3>
+  <div class="tablewrap" style="margin-bottom:16px">
+    <table class="table">
+      <thead><tr><th>活性轴</th><th>状态</th><th>为什么</th></tr></thead>
+      <tbody>
+        <tr><td><b>顺式合成的模板依赖性</b></td><td><span class="badge">计分轴</span></td><td>这是 TdT 与 Pol mu 真正分开的地方：一个在无模板的 3'-OH 上加核苷酸，一个补缺口。全部 100 分挂在这条轴上。</td></tr>
+        <tr><td>糖选择性（2'-OH 歧视）</td><td><span class="badge non">排除</span></td><td>Gly–Trp 门控是<b>真的</b>决定子，但它把 TdT + Pol mu <b>一起</b>与 Pol beta / Pol lambda 分开——支系级，极性反了。</td></tr>
+        <tr><td>保真度与移码倾向</td><td><span class="badge non">排除</span></td><td>不同的测量对象，不是同一条轴上的不同答案。</td></tr>
+        <tr><td>dRP-lyase 化学</td><td><span class="badge non">排除</span></td><td>同上。Pol mu 的 8-kDa 结构域带弱 dRP-lyase 性质，但那是另一条轴。</td></tr>
+        <tr><td>金属偏好</td><td><span class="badge non">排除</span></td><td>Co<sup>2+</sup> 挽救实验在答案键里出现，但作为<b>判定工具</b>，不作为被评轴。</td></tr>
+        <tr><td>BRCT 介导的 NHEJ 招募</td><td><span class="badge non">排除</span></td><td>BRCT 结构域两者<b>都有</b>且都必需。</td></tr>
+        <tr><td>末端桥接</td><td><span class="badge non">排除</span></td><td>与模板依赖性相关但可分离；8-kDa N 端延伸的末端桥接功能是独立表型。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>agent 读到的第一段文字（DX01 brief，明化臂，原文节录）</h3>
+  <div class="codebox"><b>CAMPAIGN BRIEF — DELTA-X v1.0, TASK DX01. Unblinded arm.</b>
+
+You are beginning an evidence campaign on two paralogous enzymes from the same
+polymerase family. They are closely related in fold and in catalytic chemistry,
+and they differ in catalytic behaviour. Your campaign will have to explain that
+difference mechanistically and defend the explanation against an experimental
+oracle you cannot see yet.
+
+The two paralogs are terminal deoxynucleotidyl transferase and DNA polymerase mu.
+Representative accessions will be supplied with the data releases.
+
+<i>WHAT YOU HAVE RIGHT NOW:</i> this brief. Nothing else. No sequences, no structures,
+no literature, no phenotype data. Tool use is blocked at the harness level for this
+task and your transcript is retained.
+
+<i>WHAT THIS TASK ASKS.</i> Four things, all before you see any data. This task is worth
+zero points. It is a pass/fail gate, and a failure caps the whole campaign at 40 of 101
+and voids three of the heaviest downstream tasks.
+
+<b>(1) DECLARE THE SCORED AXIS.</b> "Different catalytic activity" is not a measurable
+quantity. Decompose it into separable, independently measurable activity axes and
+select exactly ONE as the axis you will be scored on. …
+
+<b>(2) WRITE YOUR SEALED PRIOR.</b> Before any evidence, record what you already believe
+the answer is … This file earns you no content credit. Its only use is that the
+difference between it and your final answer is computed and reported beside your
+score, never added to it.
+
+<b>(3) DECLARE RECOGNITION HONESTLY.</b> … did you recognise this system, at which
+sentence of this brief, what do you recall of any published explanation of it …
+
+<b>(4) REGISTER HYPOTHESES.</b> Register AT LEAST FOUR competing, falsifiable hypotheses
+… under your own identifiers and in your own words, PLUS a residual hypothesis
+which states that the true explanation may lie outside the set you have just
+registered. … "Would be inconsistent with" is not a falsification clause; name the
+construct class and name the inverting verdict.</div>
+
+  <span class="under"><b>引文说明：</b>上面是<b>逐字</b>节录，省略处一律以 … 标出。已交付的 brief 文件是一份 <b>v1.0 产物</b>，所以它写的是「40 of 101」；
+  v1.1 已把 rubric 从 101 归一到 <b>100</b>（删掉了 8-kDa 口袋的区域级 +1），<b>封顶值 40 不变</b>。brief 的重写是 29 个未写 brief 之外的又一项待办。</span>
+
+  <div class="callout" style="margin-top:16px">
+    <p><b>假设由谁提出——这条已经裁定了。</b>agent 必须<b>自行提出</b>假设。设计内部有五个参考类 R0–R4，
+    但它们是 <b>grader 的</b>分类标签，<b>永不进入任何 prompt、brief、campaign 目录或 harness 文件</b>。</p>
+    <p>决定性论据是盲化：把「H2：侧翼元件」递给一个盲化 agent，等于<b>替它解盲</b>——设计自己的 SILENT-REID 检测器
+    会对着自己的题面触发。映射是<b>单向、事后</b>的：对着 agent 已经 SHA-256 冻结的<b>陈述文本</b>（不是它的标签），
+    由两名对内容分盲的 grader 做。未映射的假设保留为 R5+，不计代价。</p>
+  </div>
+
+  <div class="tablewrap">
+    <table class="table">
+      <thead><tr><th style="width:62px">参考类</th><th>grader 侧的描述（通用结构词汇，不含本案例命名）</th><th>本案例对应（<b>仅 grader 可见</b>）</th></tr></thead>
+      <tbody>
+        <tr><td><b>R1</b></td><td>环充分性——该掌部插入本身即足以设定被评轴</td><td>Loop1 充分假说</td></tr>
+        <tr><td><b>R2</b></td><td>侧翼元件——决定子位于该插入相邻的元件中，任一方向</td><td>SD1 / SD2（<b>正确方向</b>）</td></tr>
+        <tr><td><b>R3</b></td><td>区外 / 5'-磷酸近侧——决定子位于插入与其侧翼之外</td><td>8-kDa 口袋 D179 / S187</td></tr>
+        <tr><td><b>R4</b></td><td>分布式——无单一元件充分</td><td>部分为真</td></tr>
+        <tr><td><b>R0</b></td><td>残差——真解释可能在已注册集合之外</td><td>强制注册项</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="under">词汇规则：参考类一律用通用结构词汇书写，<b>绝不</b>使用本案例命名（SD1 / SD2 / Loop1 / 8-kDa 口袋）。一旦被渲染进 prompt 即等于解盲。</span>
+</section>
+
+<section class="section" id="flow">
+  <div class="section-head"><span class="idx">02</span><h2>十步流水线：从提问到结论</h2></div>
+  <p class="section-intro">
+    这十个任务不是十道独立的题，而是<b>一条带顺序锁的链</b>。每一步的产物是下一步的计分前提；
+    跳步、补写、事后改口都由密码学锁序检出，而且是<b>零分闸门</b>——不扣分，直接作废下游。
+  </p>
+
+  <div class="flowline">
+    <div class="flow-step"><b>DX01</b><small>轴线 · 密封先验 · 自提假设 · 哈希</small><span class="badge non">0 分 · 闸门</span></div>
+    <div class="flow-step"><b>DX02</b><small>两亚家族比对，回收区域，带系统发育匹配零模型</small><span class="badge">6</span></div>
+    <div class="flow-step"><b>DX03</b><small>四个「看起来决定性其实不是」的方法，跑到测得失败</small><span class="badge">12</span></div>
+    <div class="flow-step"><b>DX04</b><small>冻结编号契约，跨参照系换算</small><span class="badge">12</span></div>
+    <div class="flow-step"><b>DX05</b><small>排除账本 + 阴性集预测 + 链闸排名提名</small><span class="badge">18</span></div>
+    <div class="flow-step"><b>DX06</b><small>六个信用买十二个 shard，差异预测锁</small><span class="badge">3</span></div>
+    <div class="flow-step"><b>DX07</b><small>量纲登记 + 记录缺陷审计</small><span class="badge">18</span></div>
+    <div class="flow-step"><b>DX08</b><small>held-out 支系迁移，配污染对照</small><span class="badge">14</span></div>
+    <div class="flow-step"><b>DX09</b><small>机制口径：结构记录授权了什么</small><span class="badge">4</span></div>
+    <div class="flow-step"><b>DX10</b><small>终期档案：可信度、谱系、可计算性判决</small><span class="badge">5</span></div>
+  </div>
+  <span class="under">合计 92 分；余下 8 分是跨任务的<b>预注册完整性与校准</b>维度（哈希匹配、阈值不可变、Brier、证伪三元组）。</span>
+
+  <h3 style="margin-top:26px">每一步在问什么（原题，逐字）</h3>
+  <div class="tablewrap">
+    <table class="table">
+      <thead><tr><th style="width:62px">任务</th><th style="width:52px">轨</th><th>问题</th></tr></thead>
+      <tbody>
+        <tr><td><b>DX01</b></td><td>P</td><td>在碰任何数据之前：你将被评的那<b>一条</b>可测活性轴是哪条？你<b>已经</b>相信答案是什么？你认得这个体系吗？什么能证伪你的每一条假设？</td></tr>
+        <tr><td><b>DX02</b></td><td>R</td><td>仅凭序列与进化，哪些<b>连续区域</b>在两个亚家族之间系统性不同、且可能承载被评活性差异？最多排五个，每个给出统计量与明确零模型。</td></tr>
+        <tr><td><b>DX03</b></td><td>T</td><td>对四个<b>看起来决定性其实不是</b>的方法，事先注册什么结果能区分你的假设、什么结果意味着该方法对这个表型不提供信息——然后<b>真跑</b>，报数字。</td></tr>
+        <tr><td><b>DX04</b></td><td>F</td><td>为这批文献里出现残基编号的<b>每一个</b>参照系发出换算表，每个偏移都从<b>记录</b>推导而非背诵，并让 campaign 里后续每一条断言与之自洽。</td></tr>
+        <tr><td><b>DX05</b></td><td>N</td><td>在预言机开启之前：申报你的提名预算，然后对至多那么多个位点，预测它们<b>若被测定</b>会落入哪一类——switcher / reduced-activity-only / wild-type-like——并<b>另行</b>提交你排除的位点与极性理由。</td></tr>
+        <tr><td><b>DX06</b></td><td>N</td><td>十二个 shard 里哪<b>六个</b>最能改变你的假设排序？逐 construct 地预测每个会显示什么？</td></tr>
+        <tr><td><b>DX07</b></td><td>F</td><td>对十二个被请求的量，给出数值 + 来源 + 测定条件，<b>或者</b>声明不存在并出示建立该结论的访问轨迹；以及：你打算依赖的每条承重文献主张，<b>沉积记录</b>同意论文的<b>散文</b>吗？</td></tr>
+        <tr><td><b>DX08</b></td><td>H</td><td>五个 Family X 酶，无实验结构，无综述。每一个：做模板合成、无模板合成、还是两者都做？哪些残基承载这个行为？其中哪些你<b>认得</b>？</td></tr>
+        <tr><td><b>DX09</b></td><td>R</td><td>用一种能在结构记录面前站住的形式陈述机制，并把每一条子句标注为 established / licensed-by-this-evidence / hypothesis。</td></tr>
+        <tr><td><b>DX10</b></td><td>P</td><td>现在什么是确立的、什么只是被偏好的、什么被排除、什么仍然开放——以及<b>序列、结构与进化单独永远无法解决的是什么</b>？</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card">
+      <div class="micro red">ORDERING LOCKS · 零分闸门</div>
+      <h4 style="margin-top:9px">四条顺序锁</h4>
+      <ol class="note-list">
+        <li><code>sealed_prior</code> + <code>recognition_declaration</code> 先于一切任务</li>
+        <li><code>predicted_negatives</code> + <code>nomination_ranked</code> 先于<b>首个</b> shard 释放</li>
+        <li><code>prediction_lock</code> 先于<b>每个</b> shard 的释放检查点</li>
+        <li><code>heldout_predictions</code> 先于 held-out shard 解封</li>
+      </ol>
+      <span class="under">违反锁序<b>不扣分，直接作废 S5 整段</b>——因为「对一个凭记忆写出来的文件取哈希」与「对一个推导出来的文件取哈希」在字节上不可区分，所以这件事<b>从一开始就不应该付钱</b>。</span>
+    </div>
+    <div class="card">
+      <div class="micro red">AMENDMENT · 允许迭代</div>
+      <h4 style="margin-top:9px">修正是能力，不是违规</h4>
+      <p class="tiny">锁序<b>允许</b>修订，条件是：修订本身是一条带时间戳的日志条目，并<b>点名触发它的那次测得失败</b>。</p>
+      <p class="tiny">这条是刻意写进去的——这个案例的真实历史正是这样走的：侧翼区域来自一次两亚家族比对，<b>早于任何诱变</b>；而机制改口发生在结构解出来<b>多年之后</b>。一个不允许中途改口的 benchmark 不可能奖励真实的科研行为。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="given">
+  <div class="section-head"><span class="idx">03</span><h2>题目给 agent 提供了什么</h2></div>
+  <p class="section-intro">
+    计量释放。每一样东西都有一个<b>不早于</b>的释放时点，而最贵的那条规则是：
+    <b>披露不等于已测定</b>——题目告诉你某个位点存在，绝不意味着它被测过。
+  </p>
+
+  <div class="tablewrap" style="margin-bottom:18px">
+    <table class="table">
+      <thead><tr><th style="width:62px">任务</th><th>释放的输入</th><th>刻意<b>不</b>给的</th></tr></thead>
+      <tbody>
+        <tr><td><b>DX01</b></td><td>仅 campaign brief。工具在 harness 层封死。</td><td>序列、结构、文献、表型数据、<b>任何假设候选</b>、<b>任何区域名或结构元件名</b></td></tr>
+        <tr><td><b>DX02</b></td><td>冻结的直系同源快照、外群集、冻结坐标集、比对与 SDP 工具链</td><td>文献、表型数据。盲化臂：header 不透明 + 每结构一个随机残基偏移，来源记录剥除</td></tr>
+        <tr><td><b>DX03</b></td><td>DX02 全部 + GPU 池 + ESM-2 650M / ESM-1v + EVcouplings/plmDCA + SDP 实现 + Boltz-2 或 AF3 级共折叠器；<b>一份加垫的候选清单：48 个位点，跨两个蛋白</b></td><td>清单上<b>不附表型</b>、<b>不指明哪些曾被测定</b>、<b>不透露加垫比例</b>。诱饵抽自同样的参照系与同样的区域密度。</td></tr>
+        <tr><td><b>DX04</b></td><td>十条未剥离的 UniProt FASTA；九个坐标文件（6GO3/4/6/7、4QZA、8U0O/8U0P、3MGH/3MGI）；Carlson 构件扩增子与 Codexis 构件描述；一份待裁决的编号与出处断言清单</td><td>盲化臂：每个蛋白被一个<b>保密的每蛋白整数偏移</b>重编号，agent 必须建立自己的本地系并报出<b>本地系之间</b>的推导偏移</td></tr>
+        <tr><td><b>DX05</b></td><td>DX02–DX04 的全部</td><td><b>任何测定数据</b>——两份预测文件存盘并哈希之前，harness 拒绝释放任何 shard</td></tr>
+        <tr><td><b>DX06</b></td><td>十二 shard 目录（<b>在本任务才释放，此前任何时点都不释放</b>）、oracle 文件哈希、六个信用、以及「阴性多于阳性」这条站立声明</td><td>shard scope 只带 campaign 本地的不透明标签（segment-alpha / accessory-domain…），<b>无解剖学含义、无残基整数</b>；shard ID 每次运行重洗，对照一份密封映射</td></tr>
+        <tr><td><b>DX07</b></td><td>文献语料、坐标与序列集、在线臂的实时记录访问；十二个<b>中立措辞</b>的量请求；五个植入的<b>非</b>缺陷</td><td>不提示哪些可答。盲化臂：作者名、期刊、年份、PMID、物种名全部去标识，图转成数据表</td></tr>
+        <tr><td><b>DX08</b></td><td>五条序列（AfPolX1 / AfPolX2 / FvPolX / CpTdT / RvPolX 污染对照），可自建结构模型；DX02 与 DX04 的比对与参照系</td><td>无实验结构，无综述。盲化臂只给本地 ID</td></tr>
+        <tr><td><b>DX09</b></td><td>4QZ8–4QZI 系列（含碱基对身份与分辨率）、5D46/5D49/5D4B、6GO3–6GO7、以及去标识的证据包条目</td><td>—</td></tr>
+        <tr><td><b>DX10</b></td><td>整个 campaign 状态 + 一份带显式 root-input ID 的冻结证据包</td><td>无新资源，<b>且无新假设</b>：这里裁决的就是 agent 自己在 DX01 注册的那一组</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber">
+    <p><b>「披露不等于已测定」是一条可执行规则，不是口号。</b>DX03 那份 48 位点清单<b>不是</b>提名短名单：
+    一条 DX05 提名如果唯一的推导依据是「它出现在 DX03 的清单上」，<b>链闸直接判零</b>。</p>
+    <p>理由是算术的：约五百个位点里<b>只有约二十五个曾被测定过</b>。把候选集印出来，等于告诉 agent 五百里哪二十五个重要——
+    而那<b>本身就是答案的一大部分</b>。</p>
+  </div>
+
+  <h3>三条污染臂</h3>
+  <div class="grid g3">
+    <div class="card light">
+      <div class="micro">U-ON</div>
+      <h4 style="margin-top:8px">明化 + 联网</h4>
+      <p class="tiny">给出真名与真登录号，允许实时检索。测的是<b>检索增益</b>：工具到底加了多少先验之外的东西。</p>
+    </div>
+    <div class="card light">
+      <div class="micro">U-OFF</div>
+      <h4 style="margin-top:8px">明化 + 离线</h4>
+      <p class="tiny">同样给真名，但只有冻结镜像。与 U-ON 的差就是检索增益的估计量。</p>
+    </div>
+    <div class="card light" style="border-color:#aed4c6;background:#f4fbf8">
+      <div class="micro">BLINDED · 头条臂</div>
+      <h4 style="margin-top:8px">盲化</h4>
+      <p class="tiny">酶名改成 XP-A / XP-B，<b>每个蛋白一个保密整数偏移</b>，来源记录剥除。报告的<b>头条分数是这一臂</b>，逐项污染指数并排印出。</p>
+      <span class="under">实测教训：在 <code>probe:blinded</code> 里，一个默认模型在<b>第二句话</b>就认出了两个酶，还主动说了出来，随后<b>零工具</b>背出 UniProt 登录号、Loop1 边界与三联体编号。<b>实体盲化不能当防线</b>——它被改用作仪器，唯一真正击穿的是背下来的残基整数，所以盲化臂才加了那个保密偏移。</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="layers">
+  <div class="section-head"><span class="idx">04</span><h2>分层评估：两条轴，同一批 100 分</h2></div>
+  <p class="section-intro">
+    阶段轴 S0–S5 是<b>诊断</b>轴，给人看：agent 到底卡在哪一步。
+    题型轴 T1–T11 是<b>效度</b>轴，给机器算：多少分是解析的、多少分是抽奖、多少分是 judge。
+    <b>任一轴单独看都会误导</b>——只看阶段，看不出某一阶段是被可猜的题型撑起来的；只看题型，看不出诊断。
+  </p>
+
+  <h3>阶段轴 S0–S5（诊断）</h3>
+  <div class="bars card" style="margin-bottom:16px">
+    <div class="barrow"><div><b>S0</b> 轴线声明与假设成形</div><div class="barline"><span class="zero" style="width:2%"></span></div><div class="barval">0</div></div>
+    <div class="barrow"><div><b>S1</b> 可判定集合与参照系</div><div class="barline"><span style="width:54%"></span></div><div class="barval">14</div></div>
+    <div class="barrow"><div><b>S2</b> 证据获取：定位·取证·留痕</div><div class="barline"><span style="width:85%"></span></div><div class="barval">22</div></div>
+    <div class="barrow"><div><b>S3</b> 证据正确性：重算·量纲·几何</div><div class="barline"><span style="width:96%"></span></div><div class="barval">25</div></div>
+    <div class="barrow"><div><b>S4</b> 裁决·谱系·中途修正</div><div class="barline"><span style="width:50%"></span></div><div class="barval">13</div></div>
+    <div class="barrow"><div><b>S5</b> 结论·校准·迁移</div><div class="barline"><span style="width:100%"></span></div><div class="barval">26</div></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card light">
+      <div class="micro red">S0 为什么是 0 分</div>
+      <p class="tiny" style="margin-top:8px"><b>先验已饱和。</b>9/9 闭卷探针都点名 Loop1 为主导决定子，边界在两个蛋白里都大致正确；
+      催化天冬氨酸排除在每个做排序的探针里都是<b>主动</b>给出的；两个植入的支系诱饵被 3 个模型中的 2 个以正确的系统发育极性排除；
+      in-trans 机制改口由 4 个探针产出，其中一个<b>点名引用</b>了那篇结构工作。</p>
+      <p class="tiny">另外，A1-SCHEMA 臂实测「注入一个假设 schema 的增量价值」<b>约等于零</b>。在这里付钱＝给先验付钱。</p>
+      <span class="under">S0 是 PASS/FAIL。FAIL 把整个 campaign <b>封顶在 40</b>，并作废 S1 的枚举项与 S5 的提名、迁移格。但<b>原始阶段向量仍然并排打印</b>，带传播掩码，这样读者能分清「得不出结论」与「被上游作废」。</span>
+    </div>
+    <div class="card light">
+      <div class="micro">S3 为什么最重（25）</div>
+      <p class="tiny" style="margin-top:8px"><b>闭卷基线在这里是零，且在几何与缺陷上是负的。</b>9/9 探针<b>零</b>个正确量级：没有一个特异性指数、速率常数、米氏常数或倍数被产出；
+      碰到数字的探针都自己标了不可靠。每个探针都至少产出一次自信的捏造。</p>
+      <p class="tiny">奖励密度被刻意调高：让<b>约三十个独立重算出来的数</b>承载权重，而不是三个可引用的倍数。
+      典型题是：<b>拿已发表动力学表的三个重复值自己重算一遍</b>——会浮出两个没人报过的缺陷，一个印出来的平均值不是它自己三个测定值的均值，表的两半用了不同的标准差约定。两者都不可背诵，只有真跑算术才掉出来。</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:22px">S5 拆成两段，因为「哈希封存的证据前先验」不是结论</h3>
+  <div class="two-col">
+    <div class="card">
+      <div class="micro orange">S5a · 预言机前锁定</div>
+      <p class="tiny" style="margin-top:8px">按<b>预测与校准</b>计分：对 agent <b>自己</b>提名的那一组位点做三分类、在<b>有约束力</b>的申报预算下给出排名、以及校准项。</p>
+      <div class="codebox" style="margin-top:10px;font-size:12px">S5-A = 10 × clamp(raw/56, 0, 1)
+  raw = 3·TP + 2·TN − 2·FP_negative
+
+<i>外加</i> 每把一个 Loop1 内部阴性叫成 switcher
+      <b>固定 −1</b>，施加在比例项<i>之外</i>
+      —— 这样设计最锋利的陷阱不会被
+         归一化悄悄除掉。
+
+负分信用上限 = 链闸下实际挣得的阳性信用
+链闸 = 覆盖此处每一行的<b>零分全局乘子</b></div>
+    </div>
+    <div class="card">
+      <div class="micro">S5b · 预言机后修订</div>
+      <p class="tiny" style="margin-top:8px">不锁定，<b>对着实际释放的证据</b>计分：修订后的结论、held-out 支系判定、规则修订连接、机制细节、可计算性判决。</p>
+      <p class="tiny">这一段是 benchmark 里<b>两处</b>奖励「改口」的地方之一（另一处是下面的 S4-H）。S5a 与 S5b 的差本身就是一个被报告的量——
+      一个前后完全不变的 agent，和一个被证据推着走的 agent，在这里读数不同。</p>
+      <span class="under">S4 里还有一条新通道 <b>S4-H</b>（2 分）：一个 agent 在 S0 <b>并不持有</b>、在某条具体的已存盘证据记录<b>之后</b>才注册、并以该记录为触发器、随后被一次差异化 oracle 释放支持的假设。冷基线在这里是<b>构造性的真零</b>——没有探针跑过 campaign，所以没有探针能中途注册任何东西。</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="types">
+  <div class="section-head"><span class="idx">05</span><h2>十一种题型，以及每种的一道真题</h2></div>
+  <p class="section-intro">
+    混合分层评估的具体形态。<b>六成以上的分由确定性程序判定</b>（字符串/集合、表格逐格、数值带容差、封闭选择、排序指标、日志谓词、链闸连接）；
+    judge 只拿固定的 6 分，摊在约 34 次独立微判读上——这正是能估出 inter-rater kappa 的原因，
+    <b>把 4.5 分摊在六次判读上估不出任何东西</b>。
+  </p>
+
+  <div class="tablewrap" style="margin-bottom:18px">
+    <table class="table">
+      <thead><tr><th style="width:52px">题型</th><th style="width:190px">名称</th><th style="width:48px">分</th><th>怎么判 · 一道真题</th></tr></thead>
+      <tbody>
+        <tr><td><b>T1</b></td><td>精确字符串 / 集合匹配<br><small>带释义申诉</small></td><td><b>11</b></td>
+          <td>归一化大小写、空白与残基名形式（<code>Phe405 == F405</code>，<b>物种限定强制</b>），然后对密封键做成员或集合相等测试，逐子句二值。
+          两条复核强加的追加：每条 T1 主张<b>必须</b>带一个推导位点（FASTA 索引、记录行号或 artifact 行 ID），否则在比较前<b>删除</b>；字面不匹配但落在<b>预注册释义集</b>内的，走 judge 申诉，按该项自身权重计分。
+          <br><b>真题：</b>被测定面板的穷举枚举（28 条单残基替换，每条带可重放的检索记录）；偏移起点规则作为一条可校验字符串；记录缺陷字符串，<b>仅当</b>其重算谓词为真时给分。</td></tr>
+        <tr><td><b>T2</b></td><td>表格逐格匹配</td><td><b>18</b></td>
+          <td>agent 按固定 schema 发出一张表，grader 按键列 join，逐格相等。缺行算漏、多行计入精确率。
+          <b>区分力只来自植入的破规则行</b>——一个统一偏移能填满其余所有格，没有这些行，这个题型测的是算术不是知识。每格必须点名它是从哪条记录解析来的。
+          <br><b>真题：</b>跨参照系锚点表，从 ATOM / SEQRES / DBREF / SEQADV 行填出；三条破规则行承载全部区分力——
+          ① 因两残基插入而<b>无合法换算</b>的窗口；② 8-kDa 那个位点在小鼠是 Asp、人是 Cys、牛是 Ser，<b>不是一个平移过去的天冬氨酸</b>；③ 构件系＝全长 −140。</td></tr>
+        <tr><td><b>T3</b></td><td>带容差与条件字段的数值</td><td><b>17.5</b></td>
+          <td><code>|报告值 − 键值|</code> 落在申报的相对容差内，且<b>单位与条件字段强制</b>（金属、底物、引物状态、重复数）。<b>数对了条件错 → 0 分。</b>
+          捏造是<b>按次 −3 的比例扣分</b>、该格地板为 0，外加一个 run-level 标志——不再是清零触发器，那会让众数结果变成 0 并毁掉这个题型排序检索质量的能力。
+          <br><b>真题：</b>从已发表三重复重算缺失突变体动力学；SD 列在联合与分亚家族两次运行下的耦合<b>排名</b>；对系统发育匹配零模型的 SDP 膨胀因子；以及一条实测侧链距离——它<b>反驳</b>了流传的「芳香三明治」口号。</td></tr>
+        <tr><td><b>T4</b></td><td>封闭集合强制选择<br><small>仅限因变量</small></td><td><b>15.5</b></td>
+          <td>每题从<b>已发表的封闭词表</b>里选一个标签，对着从标签先验算出的<b>明确随机地板</b>聚合，绝不对原始准确率聚合。
+          弃权<b>永远可用</b>，且永远严格优于错误落子。<b>选项集绝不等于题目集</b>：上票面的是什么由 agent 决定，票面怎么写由 benchmark 决定。每张票都带一个 null 和一个 no-resolution 选项，<b>两者在键里都正确过</b>。每张票只在同内容的<b>自由生成</b>轮哈希完成后才触发。
+          <br><b>真题：</b>对 agent <b>自己</b>提名位点的三分类，底率陷阱原封不动：十三个阴性对十个阳性，六个阴性在 Loop1 内部，其中三个是最强阳性的<b>紧邻</b>。</td></tr>
+        <tr><td><b>T5</b></td><td>排序检索指标<br><small>recall@budget / 未截断 FPR</small></td><td><b>3</b></td>
+          <td>recall 与 rank 在<b>计算之前</b>申报并哈希的预算处截断；假阳率在<b>未截断</b>列表上算，这样截断藏不住霰弹枪。
+          <b>预算现在有约束力</b>：超预算的提名计零<b>且</b>计入精确率——这是唯一能给「往从未被测定的地带过度提名」定价的控制。被计费的阴性是<b>明确被报告过的</b>那些，绝不是「没在预言机里出现」。</td></tr>
+        <tr><td><b>T6<br>T10</b></td><td>格式一致性<br>与密码学锁序<br><small>零分闸门</small></td><td><b>0</b></td>
+          <td>两者都<b>零分，但闸住很多分</b>。<br>
+          <b>T6 void 规则：</b>grader 按申报的登录号索引 FASTA 的申报位置，比对单字母码；<b>不匹配 → 该行在任何比较前被删除</b>，并在所有计精确率的地方计为一次假阳。外加「有告诫而无对应数值 artifact 行 → 0 分」。<br>
+          <b>T10：</b>SHA-256 摘要与 append-only 日志重放。<b>违反 T10 作废 S5 而不是扣分。</b>
+          <br><b>真题：</b>void 规则对着实测基线<b>不停触发</b>——一个为 494 aa 蛋白断言的、<b>根本不存在</b>的残基索引；一个小鼠专属的催化天冬氨酸被当作通用值给出（人的是另一个号）。</td></tr>
+        <tr><td><b>T7</b></td><td>操作日志上的程序谓词</td><td><b>18</b></td>
+          <td>一个在操作日志上求值的布尔函数，每条规则<b>随附一个合规 fixture 与一个违规 fixture</b>。违规是比例扣分加标志，不是清零。
+          <b>复核强加的关键约束：</b>只有能从 <b>harness 侧</b>日志算出来的谓词才汇总进分数；需要引擎自身谱系导出的谓词<b>总计封顶 8 分</b>，并在单独的 <code>self_reported</code> 子分里报告——因为那份导出是<b>被评方自己写的</b>，而且序列化目前还不存在。
+          <br><b>真题：</b><b>purpose gate</b>——每条非中性裁决边都必须追溯到一个 <code>hypothesis_test</code> 合同下的 met finding，因此方法验证类 finding 必然携带<b>零</b>条非中性边。
+          这让「产出了一个自信的共折叠位姿并正确拒绝把它当证据」<b>可执行</b>，而不必读一句告诫散文。</td></tr>
+        <tr><td><b>T8</b></td><td>可重放访问轨迹<br><small>证明「不存在」</small></td><td><b>5</b></td>
+          <td>对一条被主张的「不存在」，agent 发出可重放轨迹——查询、端点、结果计数、时间戳、内容哈希——grader <b>对着钉住的镜像重放</b>，既检查每步可复现，也检查断言的 null 仍成立。
+          <b>现在是对称的：</b>登记册里六个量存在、六个不存在，一次<b>假的</b>不存在与一次捏造量级同样代价 −3，且每条轨迹必须点名它<b>本该</b>附着的那个具体量与 construct——这样拒绝本身是可证伪的，而不只是可重放的。
+          <br><b>真题：</b>8-kDa 口袋那一对<b>不存在</b>任何动力学常数、倍数或突变体结构——那篇结构论文把这两个残基命名为一对氢键伙伴，<b>不附任何诱变、不附任何数字</b>——所以被许可的陈述<b>只能是定向的，且不得含任何数位</b>。</td></tr>
+        <tr><td><b>T9</b></td><td>评审模型判读<br><small>不可客观化的关系</small></td><td><b>6</b></td>
+          <td>一个受 rubric 约束的 judge 对着成文标准读散文。固定 6 分摊在每 campaign 约 34 次独立微判读上，外加释义申诉。<b>judge 触及的最大权重（含已行使申诉）为 9.0。</b>
+          <b>发布条件保留：三位独立专家评完 pilot 并报出 kappa 之前，权重不发布。</b>
+          <br><b>真题：</b>预测方向的<b>物理自洽性</b>（符号对立是程序谓词；「聚合酶真的会这么干吗」不是）；一份提交的重算是否<b>确立</b>了被主张的缺陷——那条反向陷阱证明了这件事不可能被键化，因为有一处矛盾<b>没有正确解</b>，只有正确姿态。</td></tr>
+        <tr><td><b>T11</b></td><td>跨工件推导连接<br><small>链闸</small></td><td><b>6</b></td>
+          <td>一条主张行与 agent <b>自己</b>更早存盘的 artifact 中某一行之间的集合包含 join。join 失败的主张被<b>强制为 verdict unknown 而不是删除</b>，保留记录。
+          <b>现在同时还是覆盖 S5 每一个计分行（正负皆然）的零分全局乘子</b>，所以它的强度不再被自身权重封顶。没有底下那几条顺序锁它一文不值，有了就是决定性的。
+          <br><b>真题：</b>每一个被提名的区域必须落在 agent <b>自己计算并存盘</b>的某个统计量的 top-k 内；每一个被提名的位点必须带上许可它的证据记录 ID。
+          <b>那个最强的单一阳性，若在 agent 自己的分数文件里没有对应行，计零。</b>这就是让「答对但其实是背出来的」一文不值的机制。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout blue">
+    <p><b>选择题到底该不该用——这条是用算术裁的，不是用品味裁的。</b></p>
+    <p><b>规则：对因变量做封闭，对自变量做生成。</b>用强制选择去<b>钉死</b> agent 已经生成的主张，绝不用它去<b>替</b> agent 生成主张。</p>
+    <p>算术：提名维的原始量程是十阳性 ×3 + 十三阴性 ×2 = 56。实测生成地板是<b>硬零</b>（9/9 探针<b>零</b>个阴性）。
+    一旦把它变成那二十三个可计分位点的票面：纯三分类随机 <b>10.0/56</b>；一条「全答 <code>reduced_activity_only</code>」的单词退化策略拿 <b>26/56 = 最大值的 46%</b>，<b>且不触发任何惩罚</b>（−2 只对「把阴性叫成 switcher」触发）；一个零研究的芳香族启发式拿 <b>34–41/56</b>。
+    一个被工程成「全设计最干净的零」的维度，在题目集被供出的那一刻获得约一半满分的地板。推广到各维，朴素 MCQ 会让 <b>63–67 分</b>进入风险。</p>
+    <p><b>最锋利的反例是编号维</b>：它是唯一实测基线为<b>负</b>的维度（自信的错答＝最大分离）。一个四选一票面<b>按构造</b>把地板抬到 25%。那等于花掉全 benchmark 最值钱的地板，去买一个 void 规则已经确定性提供的判分便利。</p>
+  </div>
+
+  <h3>最终采纳 MCQ 的七处，<b>全部</b>在因变量上</h3>
+  <ol class="note-list">
+    <li>对 agent <b>自己</b>提名位点的三分类表型（10 分）——票面是标签，<b>永远不是位点清单</b></li>
+    <li>held-out 支系分类，选项 {templated, template-independent, <b>both</b>, insufficient from sequence}（3.5 分）——<b>both 是承重的</b>，二元先验不会主动给</li>
+    <li>agent <b>自己浮出</b>缺陷之后的裁决方向三分类 {prefer_record, prefer_prose, unresolvable}——<b>键里三种都有实例</b>，所以没有常数策略能赢</li>
+    <li>正确答案是「已记录 NULL」的参照系项</li>
+    <li>只能靠索引 FASTA 判定的<b>构件 vs 全长</b>与<b>野生型 vs 嵌合体</b>残基身份项——<b>严格优于</b>自由文本，因为自由文本允许复述口号而从不对某个位点下注；干扰项是真实的<b>邻近残基</b></li>
+    <li><b>挂靠纪律的量纲项</b>——干扰项是<b>被安到错构件上的真实数字</b>；认出那个数字对「哪个构件拥有它」<b>毫无增益</b>，而挂靠纪律正是捏造维真正的考点</li>
+    <li>从 agent <b>自己注册的</b>假设里抽出的证伪方向项——选项集是 agent 自己的对象，<b>不可能泄漏键</b></li>
+  </ol>
+</section>
+
+<section class="section" id="key">
+  <div class="section-head"><span class="idx">06</span><h2>标准答案</h2></div>
+  <p class="section-intro">
+    计分轴：<b>顺式合成的模板依赖性</b>。每一个残基号都带物种与 UniProt 登录号——
+    因为小鼠与人 TdT 自残基 360 起差 <b>+1</b>，而<b>同一个整数 385</b> 在小鼠 TdT 是实验阴性、在人 Pol mu 是阳性。
+  </p>
+
+  <div class="grid g4" style="margin:18px 0">
+    <div class="card"><div class="metric green">10</div><div class="metric-label">可计分阳性（+3 / 个）</div></div>
+    <div class="card"><div class="metric">13</div><div class="metric-label">可计分阴性（+2 / 个）</div></div>
+    <div class="card"><div class="metric red">4</div><div class="metric-label">争议位点（分子分母<b>都</b>剔除）</div></div>
+    <div class="card"><div class="metric">≈25</div><div class="metric-label">约 500 个位点里<b>曾被测定过</b>的总数</div></div>
+  </div>
+
+  <h3>跨参照系锚点表（23 行）</h3>
+  <div class="tabs" id="anchorTabs">
+    <div class="tab is-active" data-f="all">全部 23</div>
+    <div class="tab" data-f="pos">阳性 6</div>
+    <div class="tab" data-f="neg">阴性 10</div>
+    <div class="tab" data-f="con">争议 2</div>
+    <div class="tab" data-f="dec">诱饵 / 非区分 4</div>
+    <div class="tab" data-f="mech">机制 1</div>
+  </div>
+  <div class="tablewrap">
+    <table class="table" id="anchorTable">
+      <thead><tr><th>锚点</th><th>F-MT<br><small>小鼠 TdT P09838</small></th><th>F-HT / F-BT<br><small>人 P04053 / 牛 P06526</small></th><th>F-HPM<br><small>人 Pol mu Q9NP87</small></th><th>F-MPM<br><small>小鼠 Pol mu Q9JIW4</small></th><th>预言机类</th><th>注</th></tr></thead>
+      <tbody>
+        <tr data-f="con"><td><b>SD1-D</b></td><td>D399</td><td>D398</td><td>D383</td><td>D385</td><td><span class="badge con">contested</span></td><td>表与正文冲突，<b>不计分</b></td></tr>
+        <tr data-f="neg"><td><b>SD1-H</b></td><td>H400</td><td>H399</td><td>A384</td><td>A386</td><td><span class="badge neg">negative</span></td><td>reduced-activity-only</td></tr>
+        <tr data-f="pos"><td><b>SD1-F1</b></td><td><b>F401</b></td><td>F400</td><td><b>F385</b></td><td>F387</td><td><span class="badge">positive · tier A</span></td><td><b>唯一不被 Co<sup>2+</sup> 挽救</b>的 Romain 突变体</td></tr>
+        <tr data-f="neg"><td><b>SD1-Q</b></td><td>Q402</td><td>Q401</td><td>E386</td><td>E388</td><td><span class="badge neg">negative</span></td><td>Co<sup>2+</sup> <b>完全</b>挽救；不是「卡住」的聚合酶</td></tr>
+        <tr data-f="pos"><td><b>SD1-K</b></td><td><b>K403</b></td><td>K402</td><td><b>R387</b></td><td>R389</td><td><span class="badge">positive</span></td><td><b>R387 就是 SD1 位点，不在区外</b>（承重修正）</td></tr>
+        <tr data-f="neg"><td><b>SD1-C</b></td><td>C404</td><td>C403</td><td>S388</td><td>S390</td><td><span class="badge neg">negative</span></td><td>—</td></tr>
+        <tr data-f="pos"><td><b>SD1-F2</b></td><td><b>F405</b></td><td>F404</td><td><b>F389</b></td><td>F391</td><td><span class="badge">positive · tier B</span></td><td>templated-then-stuck</td></tr>
+        <tr data-f="pos"><td><b>SD2-D</b></td><td><b>D473</b></td><td>D472</td><td>N457</td><td>N459</td><td><span class="badge">positive · tier A</span></td><td>延伸 5 nt 后<b>按模板停止</b></td></tr>
+        <tr data-f="neg"><td><b>SD2-N</b></td><td>N474</td><td>N473</td><td>S458</td><td>S460</td><td><span class="badge neg">negative</span></td><td><b>两侧均为干净阴性</b></td></tr>
+        <tr data-f="con"><td><b>SD2-H</b></td><td>H475</td><td>H474</td><td>H459</td><td>H461</td><td><span class="badge con">contested</span></td><td>不计分</td></tr>
+        <tr data-f="neg"><td><b>L1-S</b></td><td>S383</td><td>S382</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td>reduced-activity-only</td></tr>
+        <tr data-f="neg"><td><b>L1-T</b></td><td>T384</td><td>T383</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td>—</td></tr>
+        <tr data-f="neg"><td><b>L1-F</b></td><td>F385</td><td>F384</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td><b>整数碰撞</b>：F-HPM 的 385 是<b>另一个蛋白的阳性</b></td></tr>
+        <tr data-f="neg"><td><b>L1-P</b></td><td>P391</td><td>P390</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td>—</td></tr>
+        <tr data-f="neg"><td><b>L1-S2</b></td><td>S392</td><td>S391</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td>—</td></tr>
+        <tr data-f="neg"><td><b>L1-D</b></td><td>D396</td><td>D395</td><td>—</td><td>—</td><td><span class="badge neg">negative</span></td><td>—</td></tr>
+        <tr data-f="pos"><td><b>8K-D</b></td><td><b>D179</b></td><td>C179（人）/ S179（牛）</td><td>A167</td><td>A167</td><td><span class="badge">positive · 仅定性</span></td><td><b>in trans</b>；<b>无任何倍数</b>，给出倍数即判捏造</td></tr>
+        <tr data-f="pos"><td><b>8K-S</b></td><td><b>S187</b></td><td>S187</td><td>R175</td><td>R175</td><td><span class="badge">positive · 仅定性</span></td><td>同上</td></tr>
+        <tr data-f="dec"><td><b>PAL-H</b></td><td>H342</td><td>H342</td><td>H329</td><td>H329</td><td><span class="badge dec">支系级诱饵</span></td><td>两家族<b>共有</b>，Pol beta / lambda 为 Gly</td></tr>
+        <tr data-f="dec"><td><b>GATE-G</b></td><td>G449</td><td>G448</td><td>G433</td><td>G435</td><td><span class="badge dec">支系级诱饵</span></td><td>糖选择性，<b>正交轴</b></td></tr>
+        <tr data-f="dec"><td><b>GATE-W</b></td><td>W450</td><td>W449</td><td>W434</td><td>W436</td><td><span class="badge dec">支系级诱饵</span></td><td>—</td></tr>
+        <tr data-f="dec"><td><b>TRIAD</b></td><td>D343/D345/D434</td><td>D343/D345/D433</td><td>D330/D332/D418</td><td>D330/D332/D420</td><td><span class="badge non">非区分</span></td><td>严格保守的双金属羧酸</td></tr>
+        <tr data-f="mech"><td><b>WEDGE</b></td><td>L398 + F405</td><td>L397 + F404</td><td>—</td><td>—</td><td><span class="badge mech">机制</span></td><td>突触复合物中的<b>引物链楔子</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="under">锚点表里<b>没有</b>人 Pol mu 的 R445 / R449——它们是精氨酸螺旋上的一对，不在 SD1 / SD2 / Loop1 的对齐列里。<b>R445A 废除末端转移酶活性而缺口填充保持野生型</b>（阳性）；<b>R449 是阴性</b>。</span>
+
+  <div class="grid g2" style="margin-top:20px">
+    <div class="card">
+      <div class="micro">十个可计分阳性 · +3 / 个</div>
+      <div class="chips" style="margin:10px 0">
+        <span class="chip"><b>mTdT F401</b></span><span class="chip"><b>mTdT K403</b></span><span class="chip"><b>mTdT F405</b></span>
+        <span class="chip"><b>mTdT D473</b></span><span class="chip"><b>mTdT D179</b>*</span><span class="chip"><b>mTdT S187</b>*</span>
+        <span class="chip"><b>hPolmu F385</b></span><span class="chip"><b>hPolmu F389</b></span><span class="chip"><b>hPolmu R445</b></span><span class="chip"><b>hPolmu R387</b></span>
+      </div>
+      <p class="tiny">* 仅定性。<b>任何附加在 D179 / S187 上的倍数都判捏造</b>——那篇结构论文把它们命名为一对氢键伙伴，不附任何诱变、不附任何数字。</p>
+    </div>
+    <div class="card">
+      <div class="micro red">十三个可计分阴性 · +2 / 个</div>
+      <div class="chips" style="margin:10px 0">
+        <span class="chip">mTdT S383</span><span class="chip">mTdT T384</span><span class="chip">mTdT F385</span><span class="chip">mTdT P391</span>
+        <span class="chip">mTdT S392</span><span class="chip">mTdT D396</span><span class="chip">mTdT H400</span><span class="chip">mTdT Q402</span>
+        <span class="chip">mTdT C404</span><span class="chip">mTdT N474</span><span class="chip">hPolmu N457</span><span class="chip">hPolmu S458</span><span class="chip">hPolmu R449</span>
+      </div>
+      <p class="tiny"><b>9/9 闭卷探针里，这十三个一个都没被点名过。</b>这 26 分就是设计所说的「真零地板」。</p>
+    </div>
+  </div>
+
+  <div class="callout red" style="margin-top:16px">
+    <p><b>设计里最好的那个陷阱。</b>小鼠 TdT <b>F385</b> 是 Loop1 里最严格保守的残基，紧贴 F401 堆积，并被 Romain 自己的 Discussion <b>点名</b>——
+    而 <b>F385A 是 reduced-activity-only 阴性</b>。S383A 与 H400A 行为相同。</p>
+    <p>一个按「Loop1 是决定子 ⟹ Loop1 残基就是答案」推理的 agent，<b>一头撞上四个阴性，丢 8 分、一分不得</b>。
+    邻域扩张启发式被对称惩罚：<b>F401 的紧邻 H400、Q402、C404 全是阴性。</b></p>
+  </div>
+
+  <h3 style="margin-top:22px">区域层面：什么被回收，什么是免费的</h3>
+  <div class="tablewrap">
+    <table class="table">
+      <thead><tr><th>区域</th><th>小鼠 TdT</th><th>人 Pol mu</th><th>分</th><th>为什么</th></tr></thead>
+      <tbody>
+        <tr><td><b>Loop1</b></td><td>无单一公认边界<br><small>Delarue 384-399 · Loc'h 382-401 · Romain 操作窗 378-406</small></td><td>367-385（定义）<br>369-385（缺失构件）</td><td><b>0</b></td><td><b>9/9 闭卷探针自由产出。</b>付钱＝给先验付钱。</td></tr>
+        <tr><td><b>SD1</b></td><td>399-405 <code>DHFQKCF</code><br><small>严格核心 QKC = 402-404</small></td><td>383-389 <code>DAFERSF</code></td><td><b>+3</b></td><td>无任何探针点名，字符串在语料中<b>零出现</b>。嵌套而非两套冲突定义。</td></tr>
+        <tr><td><b>SD2</b></td><td>473-475 <code>DNH</code></td><td>457-459 <code>NSH</code></td><td><b>+3</b></td><td>同上。<code>DNH→ANA</code> 切换表型，<code>DN→NS</code> 不切换。</td></tr>
+        <tr><td><b>8-kDa 5'-磷酸口袋</b></td><td>D179 / S187</td><td>A167 / R175</td><td><b>0</b><small>（区域级）</small></td><td>唯一真正<b>区外</b>、比对可导出的决定子——但<b>区域级不计分</b>：保留的 Opus 探针把它列为<b>第 5 位</b>元件。信用全部下移到 DX05 的残基对。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="under">这条「区域级 +1 删除」是全设计里<b>唯一一次因为实测证据而扣掉自己一分</b>的改动——rubric 从 101 归一到 100，而那条被删的理由与 Loop1 记零的理由<b>一模一样</b>：区域在先验里，残基不在。</span>
+
+  <h3 style="margin-top:22px">机制口径（必须是当前版本）</h3>
+  <div class="codebox">TdT 是<b>模板厌恶</b>（template-averse），<b>不是</b>绝对模板独立。
+
+在突触结构里，N 端结构域与 Loop1 <b>桥接两个 DNA 末端</b>，
+in trans 提供一个模板碱基，并把微同源搜索区限制为
+<b>两个碱基对</b>（一个微同源 + 一个新生），<i>不是一个</i>。
+
+Loop1 <b>明确不是伪模板</b>：它用<b>直接接触</b>稳定微同源碱基对，
+引物链楔子由小鼠 TdT <b>Leu398 与 Phe405</b> 构成。
+
+同一工作提出一个<b>有序水网络</b>，使掺入可以独立于
+in-trans 模板碱基进行 —— 所以 in-trans 模式是<b>条件性且低保真</b>的。
+
+<i>陷阱：</i>Loc'h 2019 的「Loop1 碱基选择模型」读起来像 TdT 结果，
+实际是用一个<b>携带小鼠 Pol mu Loop1 的 TdT 嵌合体</b>做的，
+并且是<b>为 Pol mu 提出的</b>，不是野生型 TdT。
+
+<i>陷阱：</i>野生型小鼠 TdT 是 <b>Asp379 / Leu381 / Lys403</b>。
+Gln379 / His381 / Arg403 是<b>嵌合体残基</b>。
+「Phe401/Phe405 夹住 His381」是嵌合体专属，且被野生型坐标反驳：
+1JMS 的芳香簇是 <b>Phe385–Phe401–His475（3.15–3.59 Å）</b>，
+而 Phe405 是一个独立锚点，<b>距 Phe401 10.8 Å</b>，堆在 Leu381 上。</div>
+
+  <div class="callout" style="margin-top:16px">
+    <p><b>可计算性判决——这是答案键的结论句，也是整个 benchmark 的立论。</b></p>
+    <p>序列、结构与进化<b>回收区域</b>：Romain 在<b>任何诱变之前</b>就从一次两亚家族比对里推出了 SD1 与 SD2，8-kDa 口袋那一对是用同样方法推出来的——<b>历史上成功过两次</b>。</p>
+    <p>但它们<b>不能识别出因果残基</b>：没有任何东西把 <b>F401</b> 与 H400、Q402、C404、F405 分开，<b>而其中三个是实验阴性</b>。
+    诚实的残差必须点名这种不可分辨性、点名 D179/S187 的仅定性状态，并点名<b>互反的、表型分辨的单残基诱变</b>是收尾测量。</p>
+    <p>最后：<b>FvPolX 根本没有 Loop1，却保留弱的模板独立延伸</b>——所以在这个折叠里，<b>Loop1 充分但不必要</b>。</p>
+  </div>
+</section>
+
+<section class="section" id="prov">
+  <div class="section-head"><span class="idx">07</span><h2>标答的来源与依据</h2></div>
+  <p class="section-intro">
+    答案键<b>不是</b>从综述里抄来的。每一条承重主张都回溯到一份一手记录——某一篇论文的某一张表、某一个 PDB 沉积文件的某一行、
+    或某一条 UniProt 特征。<b>十一条流传的数字在核验中被划掉</b>，其中一条引用的论文<b>根本不存在</b>。
+  </p>
+
+  <div class="grid g4" style="margin:18px 0">
+    <div class="card light"><div class="micro">UniProt</div><p class="tiny mono" style="margin-top:7px">P09838 · P04053 · P06526<br>Q9NP87 · Q9JIW4 · Q9UGP5<br>P06746 · A0A7M4F5K0<br>Q4X1T5 · A0A6M6DHZ3</p></div>
+    <div class="card light"><div class="micro">PDB</div><p class="tiny mono" style="margin-top:7px">1JMS · 1KDH · 1KEJ<br>4QZ8–4QZI · 5D46 / 5D49 / 5D4B<br>6GO3–6GO7 · 3MGH / 3MGI<br>8U0O / 8U0P · 4QZA</p></div>
+    <div class="card light"><div class="micro">一手文献</div><p class="tiny" style="margin-top:7px">Delarue 2002 · Juárez 2006<br>Romain 2009 · Andrade 2009<br>Gouge 2015/2016 · Moon 2017<br>Loc'h 2016/2019 · Kaminski 2020/2022/2024<br>Carlson 2024</p></div>
+    <div class="card light" style="border-color:#e2bcc5"><div class="micro red">被划掉</div><p class="tiny" style="margin-top:7px"><b>11 条</b>流传数字<small>（下方卡片列出其中六条）</small><br>其中 <b>1 篇</b>被引论文不存在<br><b>5 条</b>沉积记录与自己的 title / DBREF 矛盾</p></div>
+  </div>
+
+  <h3>逐条溯源</h3>
+  <div class="tablewrap" style="margin-bottom:18px">
+    <table class="table">
+      <thead><tr><th style="width:210px">标答主张</th><th style="width:150px">一手来源</th><th>依据的那条记录</th></tr></thead>
+      <tbody>
+        <tr><td><b>Loop1 是主导模块</b><br><small>互反转移，≥2 个谱系簇</small></td><td>Juárez 2006 NAR<br>Romain 2009 NAR<br>Loc'h 2019</td>
+          <td><b>正向：</b>删除人 Pol mu Loop1（Q9NP87 Δ369-385，<code>CCESPTRLAQQSHMDAF</code>，17 aa，保留 His367/Ser368，无接头）<b>废除</b>对无模板 poly(dT) 引物的四种 dNTP 延伸，同时把模板化催化效率<b>提高 12.9 倍</b>（k<sub>cat</sub> 0.0104 vs 0.00189 s⁻¹ = 5.5×；K<sub>m</sub> 3.99 vs 9.34 µM = 2.3×），DNA 结合紧 3–4 倍。<br><b>反向：</b>把小鼠 TdT 378-406 换成小鼠 Pol mu 对应段，<b>把 TdT 变成模板依赖聚合酶</b>；Loc'h 嵌合体在 in cis、in trans 与 NHEJ 连接三种读出上都重现 Pol mu 行为。</td></tr>
+        <tr><td><b>Loop1 在残基层面不承载答案</b></td><td>Romain 2009 Table 1</td>
+          <td>Loop1 内部<b>每一个</b>被测定的单替换都是阴性（S383A、T384A、F385A、P391L、S392A、D396A），单缺失与双缺失也是（Δ1-384、Δ1-392、Δ2-384/392）。<b>只有块替换</b>（Δ3-384/391/392、Δ13、Pol mu Loop1 嵌合体）<b>或 Loop1 之外</b>的突变才切换表型。</td></tr>
+        <tr><td><b>SD1 嵌套定义</b></td><td>Romain 2009 Discussion</td>
+          <td>严格核心 <code>QKC</code> = 小鼠 TdT Q402-K403-C404（Pol mu E386-R387-S388），坐落在扩展跨度 399-405 = <code>DHFQKCF</code> 之内——Romain 自己的 Discussion 称之为「the entire SD1 Region 399-405」，而其表把侧翼标为「extended SD1」。<b>这不是两套冲突定义，是嵌套。</b></td></tr>
+        <tr><td><b>F401 是 tier-A 阳性</b></td><td>Romain 2009</td>
+          <td>F401A 是 Romain 全部突变体里<b>唯一不被 Co<sup>2+</sup> 挽救</b>的一个；特异性 Q = <b>0.74 / 0.92 / 0.96 / 0.96</b>（模板碱基 C/T/A/G）。<br><small>注：这些 Q 值<b>没有重复数与误差棒</b>——这是「六个已记录不存在」之一。</small></td></tr>
+        <tr><td><b>K403 / F405 / D473</b></td><td>Romain 2009</td>
+          <td>K403A 与 F405A 是「templated-then-stuck」类；<b>Q402E 不是</b>「卡住」的聚合酶，它被 Co<sup>2+</sup> <b>完全挽救</b>。SD2 D473A <b>按模板延伸五个核苷酸后停止</b>。<code>DNH→ANA</code> 切换，<code>DN→NS</code> 不切换。</td></tr>
+        <tr><td><b>人 Pol mu 侧四个阳性</b></td><td>Andrade 2009 等<br><small>Methods 段里的未标注诱变寡核苷酸</small></td>
+          <td>F385G 废除末端转移酶而<b>缺口填充完好</b>；F389L 废除之；R445A 废除之而<b>缺口填充为野生型</b>。<br><small>这十条人源替换<b>只以未标注寡核苷酸的形式存在于一个 Methods 段落里</b>，<b>根本不可回忆</b>——这是 S1 枚举项真零地板的来源。</small></td></tr>
+        <tr><td style="background:#fdf0f3"><b>R387 的承重修正</b></td><td>核验比对<br>+ Romain 的 QKC→ERS</td>
+          <td><b>人 Pol mu Arg387 不在 Loop1/SD1/SD2 之外。</b>核验后的比对把 <code>D383-A384-F385-E386-R387-S388-F389</code> 对上小鼠 TdT <code>D399-H400-F401-Q402-K403-C404-F405</code>，所以 <b>R387 就是对应 Lys403 的 SD1 位点</b>，并被 Romain 自己那个标注「sequence as in pol mu」的 QKC→ERS 交换<b>独立佐证</b>。<br>R387K 把无模板催化效率提高 <b>8–74 倍</b>（dGTP 74、dTTP 38、dCTP 22、dATP 8），由 k<sub>cat</sub> 而非 K<sub>m</sub> 驱动，同时 ssDNA 结合<b>弱 4 倍</b>（K<sub>dis</sub> 1.3 → 5.5 µM）。<br><b>划掉：</b>「约 100 倍、接近 TdT 水平」——那是一次二次四舍五入，<b>无一手支持</b>。</td></tr>
+        <tr><td><b>唯一真正的区外决定子</b><br><small>D179 / S187</small></td><td>结构论文<br><small>（命名为氢键对）</small></td>
+          <td>小鼠 TdT D179 与 S187 在 8-kDa 5'-磷酸口袋里，<b>在 Loop1 以北约 200 个残基</b>。D179A 与 S187R <b>各自把 Pol mu 的残基装到对齐位置上</b>（Pol mu A167 与 R175），各自<b>改善 in-trans 模板化活性与模板碱基选择性</b>。<br><b>效应仅定性：不存在任何倍数、动力学或突变体结构。</b>这是「比对推导出来的假设奏效」的<b>第二个历史实例</b>，也是「三个区域之外什么都没有」这条断言必须重写的原因。</td></tr>
+        <tr><td><b>编号偏移的起点</b></td><td>UniProt FASTA 索引</td>
+          <td>小鼠与人/牛 TdT 编号在 <b>1-359 重合</b>，自 <b>360</b> 起 小鼠 = 人/牛 + 1。偏移起源于小鼠 359/360 的<b>重复 Gln</b>（小鼠 …E358-Q359-<b>Q360</b>-L361…；人 …E358-Q359-L360…），<b>位于 Loop1 上游</b>——所以 Loop1 已经在偏移寄存器<b>之内</b>。<br><b>划掉：</b>第一轮那句「偏移在 Loop1 下游、上游寄存器相同」<b>是错的</b>。<br>人与小鼠 Pol mu 在 329/330/332 重合，自约 380 起 小鼠 = 人 + 2；<b>人 Pol mu 361-379 不存在合法换算</b>。</td></tr>
+        <tr><td><b>野生型 vs 嵌合体</b></td><td>1JMS 坐标<br>vs Loc'h 2019</td>
+          <td>1JMS 的芳香簇是 <b>Phe385–Phe401–His475（3.15–3.59 Å）</b>；Phe405 是独立锚点，<b>距 Phe401 10.8 Å</b>，堆在 Leu381 上。SD2 夹持是 His475 氢键到 Loop1 主链羰基（Lys389 O、Glu386 O），Asp473 到 His475 ND1（2.69–2.99 Å），Asn474 到 Trp450。<b>Thr384-OH 到 Asp399 C=O 是 4.7–4.9 Å，不得称为氢键。</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>沉积记录与论文散文矛盾（DX07 计八处，下表列出可逐行核对的<b>六处</b>）</h3>
+  <div class="tablewrap" style="margin-bottom:16px">
+    <table class="table">
+      <thead><tr><th style="width:110px">记录</th><th>沉积记录说的</th><th>正确的是</th></tr></thead>
+      <tbody>
+        <tr><td class="mono"><b>6GO3</b></td><td>把移植段编号为 378-383，然后插入码 383A–383Q（<b>17 个全部无序</b>），再 400-406，TdT 407-510 不平移，终止于 510</td><td><b>不带 +1 平移</b>，且<b>不包含任何编号为 384-399 的残基</b></td></tr>
+        <tr><td class="mono"><b>6GO4–6GO7</b></td><td>移植段 378-407 直排、无插入码，TdT 407-510 重编号为 <b>408-511</b></td><td>所以论文的 Asp399/Arg403 对与其 R403A 突变体在坐标里是 <b>Asp400/Arg404</b>；且两套方案<b>彼此矛盾</b>，也都与论文宣称的 393B 方案矛盾</td></tr>
+        <tr><td class="mono"><b>6GO6</b></td><td>PDB DBREF 写 <code>P09838 407 to 530</code></td><td><b>对一个 510 aa 蛋白不可能</b></td></tr>
+        <tr><td class="mono"><b>8U0P</b></td><td>沉积 TITLE 说「DL variant … on a noncomplementary DNA double-strand break」</td><td><b>两处都错。</b>实为 Pol lambda ΔL1 在<b>1-nt 缺口单链断裂</b>上，带 dUMPNPP 与 Mg，1.90 Å。只能从 entity 序列与三条 DNA 链判定。<br><b>8U0O</b> 才是 KGET 未配对 DSB 复合物，2.05 Å。</td></tr>
+        <tr><td class="mono"><b>3MG1</b></td><td>Bebenek 2010 Table 5 印的三元复合物代码</td><td><b>3MG1 解析为一个蓝藻类胡萝卜素蛋白。</b>正确代码是 <b>3MGI</b>。</td></tr>
+        <tr><td class="mono"><b>Carlson 2024</b></td><td>为一个携带 R112G 多态的<b>人</b> TdT 印出<b>小鼠惯例</b>的残基号</td><td>其 D399/H400/F401、D396/L398/D399 与 R454/E457/R461 应为人系 <b>D398/H399/F400</b>、<b>D395/L397/D398</b>、<b>R453/E456/R460</b>。该筛选在 8 个不同残基上随机化 9 个槽位，活性阈值为插入分数 ≥ 0.7（0.27 是催化死基线，0.83 是野生型），<b>且完全没有模板依赖性读出</b>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <span class="under">另两处不在上表里：<b>Kaminski 的 ΔL1 标签在 2022 与 2024 两篇之间漂移</b>（见右下卡片——两个 Pol lambda 区间<b>不是</b>矛盾，真正的缺陷是标签漂移），
+  以及 <b>Romain 的 D399A 表—文矛盾</b>，它是一条<b>反向陷阱</b>：在现有证据下<b>没有正确解</b>，偏向表格去「解决」它<b>算假阳并在方向检查上扣分</b>，只有标为 contested 并点名矛盾才拿 DX05 的 +1。</span>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="micro red">被划掉的流传数字</div>
+      <ul class="note-list" style="margin-top:9px">
+        <li><b>「TdT H342A 活性低约 100 倍」</b>——一手文献里<b>不存在任何倍数</b>。可辩护的陈述是：模板独立活性降低，但磷酸二酯合成未被废除。</li>
+        <li><b>「G433Y 使糖选择性提高 25–40 倍」</b>——那是突变体的<b>绝对下界</b>选择因子（S &gt; 25 到 &gt; 40），对着野生型均值 5.93，即约 <b>3–18 倍</b>增益、均值约 5 倍。</li>
+        <li><b>「Nourisson 2025，17–19 残基」</b>——<b>整条删除：根本没有这篇论文。</b>Loc'h 2019 的原话是 TdT 20 aa、Pol mu 17–21 aa。</li>
+        <li><b>「Delarue 2002 有晶体堆积告诫」</b>——<b>没有，它论证的恰好相反</b>：Loop1 被至少三个保守相互作用稳定。它真正的对冲是：模板-引物双链是从 Pol beta 叠合推出的<b>模型</b>、环位移被<b>推测性地</b>归因于辅助蛋白、残基 394-397 <b>未建模</b>。</li>
+        <li><b>「Kaminski 的 Pol lambda 区间自相矛盾」</b>——不是矛盾，是<b>两个构件</b>：Ser463-Gln471 是 KGET 替换，Glu465-Gln471 是 ΔL1 缺失以单个甘氨酸融合。<b>真正的缺陷</b>是 ΔL1 这个标签在 2022 与 2024 两篇之间<b>漂移</b>。</li>
+        <li><b>Pol mu 核糖核苷酸歧视</b>——跨方法差约 <b>3.5 个数量级</b>。稳态与竞争法一致在 1.3–11；Roettger 的 492–10,959 是<b>不同底物上的不同量</b>。<b>没有任何单一规范倍数可被计分。</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="micro">六个「已记录不存在」· T8 的计分对象</div>
+      <ul class="note-list" style="margin-top:9px">
+        <li>8-kDa D179A / S187R 对的<b>任何倍数</b></li>
+        <li>TdT-Loop1-进-Pol-mu 嵌合体（Ch-loop1）的<b>动力学</b>——该移植把人 TdT 381-400 <code>ESTFEKLRLPSRKVDALDHF</code> 换到人 Pol mu 367-385 的位置，把 dNTP 特异性推向 TdT 并强烈抑制模板化合成，<b>但没有任何动力学，所以不得附加任何倍数</b></li>
+        <li>25,623 变体 TdT 筛选里的<b>模板依赖性读出</b></li>
+        <li>Co / Ni / Zn 的<b>速率常数</b></li>
+        <li>那些 Q 值的<b>重复数与误差棒</b></li>
+        <li>2005 年那篇 Mol Cell 的头对头模板依赖性梯度图——<b>镜像不可达，从键中剔除而不是猜测</b></li>
+      </ul>
+      <span class="under">这六条是<b>检索帮不上忙</b>的一半：要证明的是<b>缺席</b>。对称化之后，一次<b>假的</b>不存在与一次捏造量级同罚 −3。</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="score">
+  <div class="section-head"><span class="idx">08</span><h2>评分标准</h2></div>
+  <p class="section-intro">
+    权重<b>不是选出来的，是被实测逼出来的</b>。九个闭卷探针（三个模型 × 三类提问，<b>零工具</b>）
+    决定了哪些维度值零分、哪些扛权重。<b>原则只有一条：只给一个同权重闭卷模型产不出来的东西付钱，而且只在证据链许可时付。</b>
+  </p>
+  <div class="callout red">
+    <p><b>这批实测本身有一个必须先说清楚的限制，而且它是发布闸门上的一条。</b></p>
+    <p>那九个探针的<b>prompt 没有保留</b>。只有<b>一个</b>探针产物存活下来（<code>probe:rank:opus</code>，即本页第 09 节引的那份），
+    所以<b>第三方无法重新打分这个语料</b>。键里每一条 rubric 的 <code>cold_baseline_provenance</code> 都逐字写着这一点。</p>
+    <p>后果是分界线必须画在这里：权重的<b>顺序</b>（哪些维度是零、哪些扛重）由这个语料论证，<b>量级在 BASELINE-v2 存在之前不可在印刷品中辩护</b>。
+    <b>BASELINE-v2 是 release_gate 上与那 29 个未写 brief 并列的阻塞项。</b>本页后文所有「9/9」「零个探针」「4 个探针」式的计数，都应在这条限制下阅读。</p>
+  </div>
+
+  <div class="tablewrap" style="margin-bottom:18px">
+    <table class="table">
+      <thead><tr><th>维度</th><th style="width:46px">分</th><th style="width:70px">判法</th><th>闭卷基线实测</th></tr></thead>
+      <tbody>
+        <tr><td><b>阴性集预测与链闸排名提名</b><br><small>DX05</small></td><td><b>18</b></td><td>确定性</td>
+          <td><b>零，而且是全设计最干净的零。</b>9 个探针<b>没有一个</b>点名十三个阴性中的任何一个；区外阳性（D179、S187）与最大的反向决定子（R387）<b>零次</b>被点名。F401 出现过一次——来自最弱的模型，低到中置信，带一个<b>捏造的伙伴残基</b>与一个<b>反转的机制</b>，而且在链闸下<b>增益为零</b>，因为不存在任何证据记录。基线的特征性失败是<b>反过来那一种</b>：点名一个区域，拒绝在里面定位。<b>本维对两种失败都明码标价</b>，这正是它权重最大的原因。</td></tr>
+        <tr><td><b>held-out 支系迁移</b><br><small>DX08，配污染对照</small></td><td><b>14</b></td><td>混合</td>
+          <td><b>结构性为零：</b>这个领域里唯一那篇 2026 综述提到曲霉、Faustovirus、鳄类、缓步动物与拟菌病毒酶<b>各零次</b>，它们<b>没有任何实验结构</b>，而且没有探针接近过非脊椎动物 Family X。<b>每次 campaign 前都要重新做闭卷探针验证</b>；探针分高于零就把该项降级到污染轨并扣住其分。<b>权重从候选设计的 20 砍到 14</b>，因为只有两个目标在时间上真正是截止后，而且都给不出干净的表型判定。</td></tr>
+        <tr><td><b>编号与参照系纪律</b><br><small>DX04</small></td><td><b>12</b></td><td>确定性</td>
+          <td><b>低于零，所以是个干净的分离器。</b>零个探针陈述过任何偏移规则；探针在<b>同一个句子里</b>混用小鼠与人的编号，把一个 Pol lambda 残基断言成 Pol mu 残基（Tyr505），发明了一个 TdT 糖门控（Glu457），发明了一个 Pol mu dRP-lyase 赖氨酸（Lys249），并把小鼠专属的 Asp434 当通用值给出。这里每一项都能靠<b>索引 FASTA 或读一行 ATOM 记录</b>判定，所以从负基线到满分的落差是<b>纯工具纪律</b>——有价值，但是纪律不是洞察，所以 12 而不是更高。</td></tr>
+        <tr><td><b>方法陷阱跑到测得失败</b><br><small>DX03</small></td><td><b>12</b></td><td>混合</td>
+          <td><b>执行接近零，提案很高。</b>两个探针产出了优秀的 15–20 项带对冲的方法计划——包括 DCA 亚家族信号告诫、共折叠模板偏倚告诫与「先做校准」步骤——<b>然后什么都没跑，没产生一个数字</b>。所以分<b>只挂在 artifact 行上，绝不挂在散文上</b>。相对候选设计的刻意改动是：删掉了「16 位点 4 阳性上的预注册 AUROC 带」，它的置信区间横跨约 0.3–1.0，<b>什么都区分不了</b>。</td></tr>
+        <tr><td><b>捏造拒绝与不可得量纪律</b><br><small>DX07 上半</small></td><td><b>10</b></td><td>确定性</td>
+          <td><b>效果上低于零。</b>探针主动给出了至少三次自信的错误残基指派，以及若干个被标为「回忆而非核实」的残基号，<b>并且没有产出任何正确量级</b>。区分力的一半在<b>六个已记录的不存在</b>上——检索在那里帮不上忙，只有访问轨迹能为拒绝背书。</td></tr>
+        <tr><td><b>记录缺陷检出：记录优先于散文</b><br><small>DX07 下半</small></td><td><b>8</b></td><td>混合</td>
+          <td><b>零，而且若干探针主动传播了本维针对的那一类错误。</b>但八个缺陷里有两个<b>可能从勘误讨论的记忆里找到</b>，所以有效区分力<b>接近 6 而不是 8</b>，答案键自己写明了这一点。严格区分的是那些<b>必须解析沉积文件</b>才拿得到的：自相矛盾的 title、同一沉积系列内两套互不兼容的编号、为人源蛋白印出的小鼠惯例号、以及一条不可能的 DBREF 区间。</td></tr>
+        <tr><td><b>预注册完整性与校准</b><br><small>跨任务</small></td><td><b>8</b></td><td>混合</td>
+          <td><b>零。</b>没有探针发出过概率、证伪子句或任何形式的预注册；探针只报告粗糙的口头置信。<b>纯对冲地板是算出来并公布的，不是断言的</b>——一个只用底率的提交拿约 4 分里的 0.7——因为一个<b>不知道自己对冲地板在哪</b>的校准项，<b>没有被证明能区分任何东西</b>。</td></tr>
+        <tr><td><b>区域回收（超出免费答案的部分）</b><br><small>DX02</small></td><td><b>6</b></td><td>混合</td>
+          <td>SD1 +3、SD2 +3，各自<b>仅当</b>该区域由提交比对上报告的统计量导出、<b>且</b>出现在 agent 自己持久化分数的 <b>top-k</b> 内。<b>Loop1 记 0</b>（9/9 自由产出）。8-kDa 口袋的区域级 +1 <b>已删除</b>——此前被记为「无探针提及」是<b>事实错误</b>：保留的 Opus 探针把它列为第 5 位元件并<b>明确两次拒绝给出残基号</b>。区域在先验里，残基不在。</td></tr>
+        <tr><td><b>过程完整性、谱系与可信度重推</b><br><small>DX10</small></td><td><b>5</b></td><td>混合</td>
+          <td>确定性那一半<b>结构性为零</b>。没有探针产出过可审计的证据结构、可信度赋值或任何独立性记账，而且<b>两个探针明确把「多方法收敛」当成了「重复」</b>。权重定在 5 而不是候选设计的 82，因为<b>这些检查要解析的序列化并不公开存在</b>，所以这里每条谓词都「写完了但跑不了」；也因为<b>一个 campaign 可以完全合乎账本法而科学上空无一物</b>。</td></tr>
+        <tr><td><b>机制口径的当前性与具体性</b><br><small>DX09</small></td><td><b>4</b></td><td>judge</td>
+          <td><b>头条很高，细节为零。</b>四个相关探针中三个<b>主动</b>给出了 in-trans 改口，其中一个点名引用了那篇结构工作；盲化探针从两句话的功能描述里<b>零工具</b>重建了整幅「空间遮挡 + in trans」图景。<b>所以头条记零分、权重很小</b>；全部 4 分坐在零探针产出的细节上，<b>评分是冲着那个被背下来的口号去的，不是为它付钱</b>。</td></tr>
+        <tr><td><b>预言机请求纪律</b><br><small>DX06</small></td><td><b>3</b></td><td>确定性</td>
+          <td><b>结构性为零：没有 campaign 就没有预言机。</b>权重低，因为这项纪律<b>部分可以靠写出名义上差异化的预测来钻空子</b>，而且它的真实后果是通过<b>提名维</b>流出去的——一个把六个信用全花在 TdT 侧 shard 上的 agent <b>永远看不到</b> R387 与那对 8-kDa 残基，于是在<b>那里</b>丢内容分。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>四道闸门（<b>零分，但闸住很多分</b>）</h3>
+  <div class="grid g4">
+    <div class="card light"><div class="micro red">VOID 规则</div><p class="tiny" style="margin-top:7px">grader 按申报的<b>登录号 + 参照系 + 位置</b>索引 FASTA，比对单字母码。不匹配 → <b>该行在任何比较之前被删除</b>，并在所有计精确率处记一次假阳。</p></div>
+    <div class="card light"><div class="micro red">链闸</div><p class="tiny" style="margin-top:7px">每条主张行必须与 agent <b>自己更早存盘</b>的 artifact 中某行做集合包含 join，k = 50。join 失败 → <b>强制 verdict unknown</b>。现在同时是覆盖 S5 每一行的<b>零分全局乘子</b>。</p></div>
+    <div class="card light"><div class="micro red">PURPOSE GATE</div><p class="tiny" style="margin-top:7px">非中性裁决边<b>只能</b>来自 <code>hypothesis_test</code> 合同下的 met finding。所以方法验证类 finding <b>必然</b>携带零条非中性边——「产出自信位姿并拒绝当证据」因此<b>可执行</b>。</p></div>
+    <div class="card light"><div class="micro red">锁序 T10</div><p class="tiny" style="margin-top:7px">SHA-256 摘要 + append-only 日志重放。<b>违反作废 S5 而不是扣分</b>——因为对记忆写出的文件取哈希与对推导出的文件取哈希<b>字节上不可区分</b>。</p></div>
+  </div>
+
+  <h3 style="margin-top:22px">DX05 的算术，<b>冻结在此</b></h3>
+  <div class="codebox">原始最大值 = 10 阳性 × 3  +  13 阴性 × 2  +  1 分争议标记奖励  =  <b>57</b>
+
+维度分 = 18 × max(0, raw) / 57     <i>（四舍五入到 2 位小数）</i>
+
+<b>线性，不是 min(raw, 18)</b>。在封顶读法下，光读十三个阴性（26 raw）
+就能打满该维度，<b>阳性变得一文不值</b>——与意图完全相反。
+
+<i>冻结的上限：</i>
+  提名预算 N 由 agent 自行申报，<b>至多 15</b>
+    （v1.0 的 N=10 <b>正好等于阳性个数</b>，那是一次算术交底）
+  predicted_negatives.csv 按规范 join-key 顺序<b>位置性封顶 40 行</b>
+
+<i>矛盾规则：</i>同一 construct 在两文件里 predicted_class 矛盾
+  → <b>两边均记 0</b>，并计入未截断假阳分子
+
+<i>信用匹配：</i>按<b>完整 construct</b>（accession, frame_id, position, mut_aa）
+<i>惩罚匹配：</i>按<b>位置</b>——所以在一个已计分阴性位点上换个替换
+  <b>拿不到免费的上行空间</b>
+
+<i>负分信用上限</i> = 链闸下实际挣得的阳性信用
+  （不得因「知道什么不是答案」而比「知道答案」拿得更多）</div>
+</section>
+
+<section class="section" id="opus">
+  <div class="section-head"><span class="idx">09</span><h2>Claude Opus 5 的默认基线：答案与得分</h2></div>
+  <p class="section-intro">
+    探针 <code>probe:rank:opus</code>：<b>闭卷、零工具、仅凭记忆</b>。
+    下面是它实际写出来的东西，以及每一维一个 grader、各配一个「默认立场为 grader 太宽松」的对抗性复核之后的修正分。
+  </p>
+
+  <div class="grid g4" style="margin:18px 0">
+    <div class="card"><div class="metric">0.5</div><div class="metric-label">最终总分 / 100</div></div>
+    <div class="card"><div class="metric red">−1.5</div><div class="metric-label">raw —— <b>两条编号漂移惩罚确实触发了</b></div></div>
+    <div class="card"><div class="metric">10 / 11</div><div class="metric-label">维度在无 campaign 时<b>结构性不可达</b></div></div>
+    <div class="card"><div class="metric">0.0</div><div class="metric-label">三种与 v1.1 自洽的读法把它带到的值</div></div>
+  </div>
+
+  <div class="callout amber">
+    <p><b>一处必须更正的早期说法。</b>我此前说这份提交「一分没扣 / 零惩罚触发」——<b>那是错的</b>。
+    raw 是 <b>−1.5</b>：<b>两条编号漂移惩罚确实触发了</b>（牛 TdT 独立偏移、人 TdT ~20 aa 异构体），只是被<b>逐维地板</b>吸收了，所以总分上看不见。</p>
+    <p>而且那 0.5 分本身是<b>脆的</b>：设计对三个问题沉默——合取的 +2 是否容许半分；<code>artifact_schemas.json</code> 成为规范之后，答案团里的散文算不算被计分产物；
+    从自由散文里读谱系去<b>否定</b>一分，是否同时有义务读它来<b>触发</b>该维的自动零。三种读法都与 v1.1 自洽，<b>三种都把它带到 0.0</b>。</p>
+  </div>
+
+  <h3 style="margin-top:20px">它写了什么（原文节录）</h3>
+  <div class="codebox">Closed-book answer, from memory only. I want to lead with a calibration
+statement, because I think the honest answer is partly a refusal of the
+question's framing.
+
+<b>The honest headline: the TdT/Pol μ difference is not primarily a set of point
+residues — it is one loop.</b> … Single-residue swaps have, as far as I recall,
+never converted one enzyme into the other; loop swaps and loop deletions have.
+<b>So a ranked list of ten residues would be mostly confabulation on my part, and
+I will not produce one.</b>
+
+<i>1.</i> Loop1 of TdT — mouse TdT residues ≈384–398 (UniProt P09838, mouse numbering;
+   human TdT P04053 is within ~1–2 of this, but see the isoform caveat) …
+   <b>I do not reliably recall the identities of the individual side chains
+   inside Loop1, and I decline to invent them.</b>
+<i>2.</i> Loop1 of human Pol μ — residues ≈366–385 (UniProt Q9NP87, human Pol μ
+   numbering) …
+<i>3.</i> Gly433, human Pol μ … <b>I am explicitly flagging that it is the wrong
+   answer to this particular question.</b>
+<i>4.</i> His329, human Pol μ. Confidence: low-medium.
+<i>5.</i> The 8-kDa domain and its N-terminal extension (region, not a residue).
+   <b>I cannot name the residues.</b>
+<i>6.</i> Loop2 / thumb-subdomain differences. Confidence: low.
+
+<b>Numbering-convention warnings (these matter and are easy to get wrong).</b>
+(a) Older TdT literature uses <b>bovine TdT numbering</b>, which is offset from
+mouse/human. (b) Human TdT exists as short and long isoforms (TdTS/TdTL)
+differing by a ~20-aa insert, so human TdT residue numbers in papers can be
+offset by ~20 depending on the isoform used. (c) Mouse TdT (510 aa) and human
+Pol μ (494 aa) numbering are not interconvertible by a constant offset — you
+must map through a structure-guided alignment, not by arithmetic.
+
+<b>What I do not know:</b> the identities of individual Loop1 side chains in either
+enzyme … and any validated single point mutation that converts TdT into a
+template-dependent polymerase (I believe none exists — the published conversions are loop deletions/swaps).</div>
+
+  <h3 style="margin-top:20px">逐维得分</h3>
+  <div class="tablewrap" style="margin-bottom:16px">
+    <table class="table">
+      <thead><tr><th>维度</th><th style="width:72px">得分</th><th>判定理由</th></tr></thead>
+      <tbody>
+        <tr><td>阴性集预测与链闸排名提名</td><td><b>0</b> / 18</td><td>十个阳性<b>零个</b>、十三个阴性<b>零个</b>被分类；与键碰撞的整数（384、385）<b>只作为区间端点</b>出现；九个必填行字段<b>一个都不存在</b>。这是<b>诚实的零</b>，不是被罚的零——没有惩罚触发。</td></tr>
+        <tr><td>held-out 支系迁移</td><td><b>0</b> / 14</td><td>aspergillus / faustovirus / 鳄类 / PolX / A0A6M6 / Q4X1T5 / G501 / L398 / F405 / 253-338-478 <b>全部零命中</b>。七个子项全定义在它从未抵达的 held-out 目标上。而且它<b>正面抵触</b>答案键：它称 Loop1 为「the dominant determinant」，键的结尾是<b>「FvPolX 根本没有 Loop1，却保留弱的模板独立延伸，所以 Loop1 充分但不必要」</b>。</td></tr>
+        <tr><td>编号与参照系纪律</td><td><b>0</b> / 12</td><td>十二个换算项<b>零个</b>（无 PDB 记录、无 DBREF、无索引操作、无陈述的偏移整数），外加<b>两条自相矛盾的编号断言各 −1</b>（牛、以及人 TdT ~20 aa 异构体），所以 <b>−2 raw、地板为 0</b>——尽管它七个残基身份<b>七对七全对</b>且都带了物种与登录号。</td></tr>
+        <tr><td>方法陷阱跑到测得失败</td><td><b>0</b> / 12</td><td>三个 +4 区块全部要求<b>数值 artifact 行</b>；<code>methods_proposed</code> 是空列表、<code>used_any_tool</code> 是 false，所以无物可计。设计自己的原话：<b>「分只挂在 artifact 行上，绝不挂在散文上。」</b></td></tr>
+        <tr><td>捏造拒绝与不可得量纪律</td><td><b>0</b> / 10</td><td><b>零次捏造量级</b>（全篇没有 k<sub>cat</sub>、K<sub>m</sub>、K<sub>d</sub>、Q 值或倍数——对着一个<b>主动捏造</b>的基线，这是个干净结果）。但唯一的正项是「每个正确存在性判定 +1，<b>须带来源与测定条件</b>」，而它作出的唯一存在性判断（<code>I believe none exists</code>）<b>两者都没给，且对着键是错的</b>。</td></tr>
+        <tr><td>记录缺陷检出</td><td><b>0</b> / 8</td><td>八个记录缺陷<b>一个都没被提名</b>（<b>被「植入」的是五个非缺陷</b>，缺陷本身是关于已发表记录的真实事实）。全篇只出现过<b>一个</b> PDB 登录号——<code>1JMS</code>，而它<b>不属于</b>那八处缺陷沉积中的任何一个；无 6GO3–6GO7、无 8U0P、无 3MGI，无 DBREF，无重算 artifact。本维的信用<b>只在带注册重算产物时</b>给分，所以 0/8 成立。</td></tr>
+        <tr><td>预注册完整性与校准</td><td><b>0</b> / 8</td><td>四个合取项<b>结构性全失</b>：没有哈希产物所以无摘要可匹配；阈值不可变性在空日志上<b>空真</b>；Brier <b>无定义</b>（零个数值概率）——<b>低于那条约 0.7/4 的底率对冲地板</b>，而那条地板是为「<b>确实发出</b>概率的提交」定价的；没有注册证伪子句，所以没有子句能触发。</td></tr>
+        <tr><td>区域回收</td><td><b>0</b> / 6</td><td>v1.1 下这一维<b>只有两个计分对象</b>：SD1 +3、SD2 +3，各带<b>两个合取条件</b>（由提交比对上报告的统计量导出 <b>且</b> 落在 agent 自己持久化分数的 top-k 内）。两者在提交物里<b>grep 为零</b>。8-kDa 口袋它确实点到了（列为第 5 位元件），但<b>区域级 +1 在 v1.1 已被删除</b>，所以那里<b>没有分可拿</b>；该口袋的信用整体下移到 DX05 的残基对 D179/S187，而它明确拒绝（<code>I cannot name the residues</code>）。</td></tr>
+        <tr><td><b>过程完整性、谱系与可信度重推</b></td><td><b>0.5</b> / 5</td><td><b>全场唯一在板上的分。</b>+2 可计算性判决的一半：它<b>刻意用一个排序的「区域」清单替换掉被要求的残基清单</b>，并明确拒绝单残基因果性（<code>a ranked list of ten residues would be mostly confabulation on my part, and I will not produce one</code>）。但合取项「<b>from computation alone</b>」缺席，因为<b>没有任何计算跑过</b>；而谱系 +1 记<b>零</b>而非 0.5，因为第 1 条的两个引用（Delarue EMBO J 2002、Romain NAR 2009）是<b>同一个 Delarue 实验室谱系</b>。</td></tr>
+        <tr><td>机制口径的当前性与具体性</td><td><b>0</b> / 4</td><td>in-trans 头条<b>按实测定价为零</b>（4 个探针里 3 个主动给出）。三个可付项全失：<b>「两个碱基对」从未陈述</b>（只有一个对冲的「1–2 nt of microhomology」）、<b>Leu398/Phe405 楔子从未点名</b>、<b>「water」出现零次</b>——而且它供上来的正是本维存在意义所在的那个<b>被取代的口径</b>（<code>Loop1 … occupies the groove where a template strand would lie</code>，对着键的<code>explicitly not a pseudo-template</code>）。</td></tr>
+        <tr><td>预言机请求纪律</td><td><b>0</b> / 3</td><td>六个信用 × 0.5，<b>全部未花</b>：十二个 shard <b>零个</b>被请求，无 <code>oracle_requests.jsonl</code>，无 <code>prediction_lock.json</code>。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>三条编号警告：一对两错</h3>
+  <div class="grid g3">
+    <div class="card light" style="border-color:#aed4c6">
+      <div class="micro">✓ 对 —— 而且是全篇最好的技术陈述</div>
+      <p class="tiny" style="margin-top:8px">「小鼠 TdT（510 aa）与人 Pol mu（494 aa）不能用常数偏移互换，必须走<b>结构引导比对</b>而不是算术。」</p>
+      <p class="tiny"><b>核验：</b>F-MT→F-HPM 的锚点偏移是 <b>12</b>（8-kDa 口袋 179→167、187→175）、<b>13</b>（palm His 342→329、三联体 343→330、345→332）、<b>16</b>（SD1 399-405→383-389、SD2 473-475→457-459、gate 449→433）。<b>三个不同值，确实非常数。</b></p>
+      <span class="under">它仍得 <b>0 分</b>——因为这一维付钱给<b>从序列索引或字节可检记录位点推导出来的</b>换算项，而这是一条<b>凭记忆的惯例</b>：无 artifact、无偏移整数。<b>这是整份报告里最能说明 DELTA-X 在给什么付钱的一处。</b></span>
+    </div>
+    <div class="card light" style="border-color:#e2bcc5">
+      <div class="micro red">✗ 错 · 漂移 −1</div>
+      <p class="tiny" style="margin-top:8px">「较老的 TdT 文献用<b>牛</b>编号，与小鼠/人有偏移。」</p>
+      <p class="tiny"><b>核验：</b>牛（P06526，509 aa）与<b>人同系</b>：<code>P06526[398-404] = DHFQKCF = P04053[398-404]</code>，而小鼠是 <code>P09838[399-405]</code>。</p>
+      <p class="tiny">正确表述是 <b>小鼠 = 人/牛 + 1</b>（自 360 起）。<b>把「小鼠/人」并成一个系才是错误所在。</b></p>
+    </div>
+    <div class="card light" style="border-color:#e2bcc5">
+      <div class="micro red">✗ 错 · 漂移 −1（grader 漏掉的第二条）</div>
+      <p class="tiny" style="margin-top:8px">「人 TdT 有长短异构体，差约 <b>20 aa</b> 的插入，所以人 TdT 的残基号可能偏移约 20。」</p>
+      <p class="tiny"><b>核验：</b>那个 20 残基插入是<b>小鼠</b>的：P09838 带 <code>VAR_SEQ 482 K → KGKTVTISPLDGKVSKLQKAL</code>。人 P04053 的两个异构体差的是 <code>VAR_SEQ 454 Missing</code>——<b>一个</b>残基。</p>
+      <p class="tiny">这是把小鼠的结构<b>移植到人身上</b>，并对 F-HT 系断言了一个<b>捏造的量级</b>。</p>
+      <span class="under"><b>减轻情节：</b>即便在小鼠，该插入位于 482，在 Loop1（按本提交自报的 ≈384-398；键给出四种并存定义）、SD1（399-405）、SD2（473-475）<b>下游</b>，动不了任何计分锚点——所以这是一条<b>错规则</b>，不是一个<b>错号</b>。</span>
+    </div>
+  </div>
+
+  <div class="callout blue" style="margin-top:16px">
+    <p><b>还有一处近失，值得单独记录——它是捏造维应有行为的样板。</b></p>
+    <p>原文：「I have a weak, unreliable association with a Glu in the mid-450s in mouse TdT, <b>which I would not rely on</b>.」</p>
+    <p>核验：<code>P09838[455-460] = QFERDL</code>，所以 457 <b>确实</b>是 Glu，这个联想<b>字面为真</b>。
+    但小鼠 TdT 真正的糖门控是 <b>G449/W450</b>（<code>P09838[448-454] = LGWTGSR</code>），所以「mid-450s 的 Glu 作为 Pol mu gate 的 TdT 对应位」<b>是错的</b>——
+    它正是九探针基线直接断言的那个 <code>Glu457</code> 捏造的<b>对冲版本</b>。</p>
+    <p>因为它被<b>免责</b>而非被<b>断言</b>，所以<b>既不扣分也不给分</b>。<b>一个被免责的非断言不是断言。</b></p>
+  </div>
+
+  <h3 style="margin-top:20px">为什么是零——以及为什么这正是设计想要的结果</h3>
+  <div class="two-col">
+    <div class="card">
+      <div class="micro">FLOOR, NOT PENALTY</div>
+      <p class="tiny" style="margin-top:8px">它<b>落在地板上，不是被打下去的</b>。DX05 的陷阱就是为惩罚「Loop1 是决定子 ⟹ Loop1 残基就是答案」这条推理建的——会一头撞上四个阴性，丢 8 分、一分不得。</p>
+      <p class="tiny">Opus 给了区域（≈384–398）但<b>拒绝在区域内部下结论</b>。那个区间里含 T384、F385、P391、S392、D396——<b>五个干净阴性</b>——它<b>一个都没分类</b>。所以是 <b>0 分，不是 −8 或 −10</b>。</p>
+      <p class="tiny">设计自己的 <code>cold_baseline</code> <b>正好预言了这个行为</b>：「基线的特征性失败是反过来那一种——点名一个区域，拒绝在里面定位。」<b>这个维度把两种失败都明码标价。</b></p>
+    </div>
+    <div class="card">
+      <div class="micro red">WHAT IT NEVER REACHED</div>
+      <p class="tiny" style="margin-top:8px"><b>十个阳性、十三个阴性，全部零提及。</b>最贵的一处缺席是 <b>R387</b>——答案键标为「承重修正」的那一条。它在提交物里 <b>grep 为零</b>。</p>
+      <p class="tiny"><code>399 / 401 / 403 / 473 / 179 / 187 / "SD1" / "SD2" / "DHFQKCF"</code> 同样<b>全部为零</b>。<code>405</code> 只出现过一次，还是<b>登录号 P04053 的子串</b>。</p>
+      <p class="tiny">十三个阴性那一侧的 <b>13 × 2 = 26 个原始单位</b>（全 23 位点面板是 <b>56</b> 个原始单位）就是设计所说的<b>真零地板</b>，这份提交<b>正好坐在上面</b>——阳性侧同样为零。</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="verdict">
+  <div class="section-head"><span class="idx">10</span><h2>实测裁决：0.5 分不是最坏的消息</h2></div>
+  <p class="section-intro">
+    把<b>四种实测</b>提交物放到同一把 100 分尺子上重新跑一遍之后，出现了一个<b>比任何单项缺陷都严重</b>的结果。表中第二行的「朴素白嫖 4」<b>不是实测点</b>，列出只是为了标明那条被收回的设计自称。
+  </p>
+
+  <div class="tablewrap" style="margin-bottom:16px">
+    <table class="table">
+      <thead><tr><th>提交物</th><th style="width:70px">分数</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>无工具先验（闭卷 Opus）</td><td><b>0.5</b><small> / 0.0–0.5</small></td><td>本页第 09 节。</td></tr>
+        <tr><td>朴素白嫖</td><td><b>4</b><small> · 未实测</small></td><td>设计<b>自称</b>的白嫖上限，按旧的 ~4/<b>101</b> 制<b>算</b>出来的，<b>从未实测</b>。键自己判这个自称<b>错了一个数量级以上</b>：分层重切初稿的白嫖路径<b>实测 16–27/100</b>（4–7 倍），已由 21 项红队修改收回，<b>而收回之后的白嫖分尚未实测</b>——这是下一步必须补的数字。</td></tr>
+        <tr><td><b>懒惰</b>伪造者<br><small>47 个产物格式齐全、合同事后补、证据 ID 虚构、哈希最后才算</small></td><td><b>40</b></td><td><b>40 就是 DX01 的 FAIL 封顶值</b>——作弊者能稳定达到的<b>天花板就是地板</b>。run-level 惩罚前的严格行走是 60。</td></tr>
+        <tr><td>诚实的强 agent</td><td><b>73</b><small> / 57–87<br>盲化臂 ≈63</small></td><td>真跑完整条链，带可答性判决预言的限制。</td></tr>
+        <tr style="background:#fdf0f3"><td><b>称职</b>伪造者<br><small>按时间顺序写文件；伪造一份 ID 可解析的分数文件；做一遍诚实索引</small></td><td><b>92</b></td><td><b>只丢 8 分，全部来自赛前闭卷探针</b>——设计里<b>唯一一次</b>测的是「模型」而不是「提交物」的测量。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn">
+    <b>顶部发生倒置。</b>排序是 <b>称职伪造者 92 &gt; 诚实 agent 73（盲化 63）&gt; 懒惰伪造者 40 &gt; 朴素白嫖 4 &gt; 先验 0.5</b>。
+    benchmark 把伪造者排在诚实 agent 之上，而那十八分的一维（DX05，<b>专为抗污染而建</b>）贡献了其中<b>十分</b>的差距。这是不可发布的结果。
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card">
+      <div class="micro red">D15 · 根因，只有一条</div>
+      <p class="tiny" style="margin-top:8px"><b>链闸是对 agent 自己写的文件做一致性检查。</b>grader 手里有 agent 的比对，却<b>从不在它上面重跑任何打分</b>——所以可导出性是<b>可断言的</b>而非<b>可证明的</b>。</p>
+      <p class="tiny"><b>100 分里有 54 分仅凭「撰写」即可达到</b>，没有任何闸门读过 agent 没写过的东西。</p>
+      <p class="tiny">逐维看伪造者白拿在哪：编号 <b>12/12</b>（<b>背下来的正确 locus 与推导出来的逐字节相同</b>）、方法陷阱 <b>12/12</b>（「有告诫无数值行者 0 分」这条防线<b>假设行不能伪造</b>——能）、数量登记 <b>10/10</b>（捏造检测器罚的是<b>错</b>的量级，不是<b>没挣来</b>的量级）、记录缺陷 <b>8/8</b>、机制 <b>4/4</b>。这五维合计 <b>46</b>；把 D15 真正打开的那一维——DX05 提名 <b>18/18</b>——按链闸实际能挡住的份额折进来，才凑到 <b>54</b>。</p>
+      <span class="under"><b>唯一的修法是重执行审计：</b>grader 必须对着冻结输入<b>重跑</b> agent 申报的一部分计算并比对——DX02 的 SDP 分数、DX03 的 plmDCA 联合/分支系排名、DX07 的重算。除此之外<b>没有任何东西</b>能把「推导出来的数」与「背出来的数」分开。<b>这是全设计最高价值的未修项。</b></span>
+    </div>
+    <div class="card">
+      <div class="micro red">D14 · 一个独立的<b>科学</b>缺陷</div>
+      <p class="tiny" style="margin-top:8px"><b>设计叫 agent 去建的那个统计量，在 SD1 内部与答案键反相关。</b></p>
+      <p class="tiny">看 SD1 的两亚家族对齐列：</p>
+      <div class="codebox" style="margin:9px 0;font-size:12px">mTdT   D399  <b>H400</b>  F401  <b>Q402</b>  K403  <b>C404</b>  F405
+hPolmu D383  <b>A384</b>  F385  <b>E386</b>  R387  <b>S388</b>  F389
+       ────  激进   <i>零</i>   激进   中等   激进   <i>零</i>
+             替换  对比  替换        替换  对比</div>
+      <p class="tiny"><b>每一个激进替换列都是阴性</b>（H400/A384、Q402/E386、C404/S388），而<b>两个零对比列在两个蛋白里都是阳性</b>（F401/F385、F405/F389）。</p>
+      <p class="tiny">十个阳性里<b>有四个用规定方法不可达</b>。这与作弊无关——它<b>独立地给诚实天花板封顶</b>，而且是关于这个案例的<b>真实科学发现</b>。</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:22px">诚实的 73 分拆开看</h3>
+  <div class="bars card">
+    <div class="barrow"><div>工具使用与记录纪律</div><div class="barline"><span style="width:100%"></span></div><div class="barval">≈39</div></div>
+    <div class="barrow"><div>哈希与校准记账</div><div class="barline"><span style="width:28%"></span></div><div class="barval">≈11</div></div>
+    <div class="barrow"><div>区域回收与机制阅读</div><div class="barline"><span style="width:23%"></span></div><div class="barval">≈9</div></div>
+    <div class="barrow"><div>held-out 迁移</div><div class="barline"><span style="width:17%"></span></div><div class="barval">≈6.5</div></div>
+    <div class="barrow"><div><b>残基层面的机制推断</b></div><div class="barline"><span style="width:19%;background:#c36e3b"></span></div><div class="barval">7.5</div></div>
+  </div>
+  <div class="callout amber" style="margin-top:14px">
+    <p><b>残基层面的机制推断只占总分的 10%。</b>所以 DELTA-X 是一个<b>带机制模块的 agentic-rigour benchmark</b>，不是反过来。<b>发表时必须这么说。</b></p>
+  </div>
+
+  <h3 style="margin-top:22px">今天能跑的 / 卡在写字上的 / 真被 EvoAgenda 卡住的</h3>
+  <div class="grid g3">
+    <div class="card light" style="border-color:#aed4c6">
+      <div class="micro">能跑（已验证）</div>
+      <ul class="note-list" style="margin-top:8px">
+        <li><code>grader/release_lint.py</code> 剥除 <code>&lt;&lt;&lt;GRADER-ONLY&gt;&gt;&gt;</code> 围栏后对词表 grep：盲化臂执行 <b>64</b> 个 token、明化臂 <b>49</b> 个。投毒测试抓出 <code>SD1</code> / <code>F401</code> / <code>P09838</code> 并 <b>FAIL</b>。</li>
+        <li><code>grader/build_arm.sh</code> 已按白名单生成 <code>_release/{U-ON,U-OFF,BLINDED}/</code>，三臂 PASS——<b>但这个 PASS 近乎空洞</b>，因为树里只有 2–3 个文件。</li>
+        <li><code>agent_facing/artifact_schemas.json</code> 冻结了 join key、四套封闭词表及其序、CSV 方言、两条规范化规则、数值容差、ID 文法，以及设计此前<b>从未定义过</b>的一项：「resolvable」到底是什么意思。</li>
+        <li>链闸、void 规则、矛盾规则、摘要校验器、DX05 算术——<b>今天就能写并单测</b>。</li>
+      </ul>
+    </div>
+    <div class="card light" style="border-color:#e6cdb3">
+      <div class="micro orange">卡在写字上</div>
+      <ul class="note-list" style="margin-top:8px">
+        <li><b>29/30 个 brief 没写</b>，包括<b>全部十个盲化版</b>——而盲化臂是污染协议指定的<b>头条臂</b>。</li>
+        <li>47 个产物里 <b>39 个没有列契约</b>，<b>0 个</b>示例行改成虚构参照系（<code>F-XX</code> / <i>Exemplaria didactica</i> / <code>EXAMPLE1</code>）。</li>
+        <li>三个 harness 输入不存在，其中 <code>phenotype_classes.md</code> 缺席意味着 <b>DX05 字面上不可计分</b>。</li>
+        <li>六项 v1.0 致命泄漏未关：shard 目录明文写出计分区域名、一个任务输入披露了十六个被测定位点（<b>字面上就是锚点表的行</b>）、提名预算上限<b>等于</b>可计分阳性个数。</li>
+        <li><b>BASELINE-v2</b>：九探针的 prompt 未保留、只存活一个产物，<b>权重的证据基础不可复现</b>。这项不是「写字」能解决的，要重跑一批探针并留档。</li>
+        <li>重切版的 free-rider 路径<b>尚未实测</b>（初稿 16–27/100，21 项红队修改之后的分数未知）。</li>
+      </ul>
+    </div>
+    <div class="card light">
+      <div class="micro">真被 EvoAgenda 卡住</div>
+      <p class="tiny" style="margin-top:8px"><b>比看上去少得多</b>：只有三个语义真的需要私有引擎——</p>
+      <ol class="note-list">
+        <li><code>between</code> 的闭开区间</li>
+        <li>浮点容差</li>
+        <li>方向标签的拼写</li>
+      </ol>
+      <p class="tiny">顺序锁与链闸等的是<b>一个会写日志的 harness</b>，不是引擎。</p>
+      <p class="tiny">（EvoAgenda 确认为私有：biomni 0.0.8 wheel、snap-stanford/Biomni 源树、GitHub 代码搜索与 PyPI <b>均无</b>；序列化不可恢复。）</p>
+    </div>
+  </div>
+
+  <div class="warn" style="margin-top:18px">
+    <b>发布闸门：BLOCK。</b> ①六项 v1.0 致命泄漏未关；②顶部分数倒置：称职伪造者 92 &gt; 诚实 agent 73。
+    下一步单项最高价值的动作是<b>建重执行审计</b>——它同时关掉顶部倒置和那 54 分的撰写可达面。
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer class="footer">
+  <b>DELTA-X v1.1 · 案例走查</b>（TdT / Pol mu 的 in cis 模板依赖性分化）。
+  证据来源：UniProt（P09838 / P04053 / P06526 / Q9NP87 / Q9JIW4 / Q9UGP5 / P06746 / A0A7M4F5K0 / Q4X1T5 / A0A6M6DHZ3）、
+  PDB（1JMS / 1KDH / 1KEJ / 4QZ8–4QZI / 4QZA / 5D46 / 5D49 / 5D4B / 6GO3–6GO7 / 3MGH / 3MGI / 8U0O / 8U0P）、
+  Delarue 2002、Juárez 2006、Romain 2009、Andrade 2009、Gouge 2015/2016、Moon 2017、Loc'h 2016/2019、Kaminski 2020/2022/2024、Carlson 2024 等一手记录。
+  机器可读冻结件：<code>grader/delta_x_v1_1.json</code>。姊妹页：<a href="01_paper_reproduction.html">01</a> ·
+  <a href="02_benchmark_modules.html">02</a> · <a href="03_mechanism_discovery.html">03</a> ·
+  <a href="04_tdt_polmu_delta_x.html">04</a> · <a href="05_worked_example.html">05</a> ·
+  <a href="07_for_ml_readers.zh.html">07（给 AI 读者的 v2 说明页）</a>。
+  <br><br>
+  <b>本页含答案键，不得作为输入喂给被测 agent。</b>
+  状态：v1.1 冻结草稿，<b>从未运行</b>；发布闸门 <b>BLOCK</b>；权重顺序由实测基线逼出，量级待 pilot 与 inter-rater kappa。
+</footer>
+
+<script>
+(function(){
+  var tabs=document.getElementById('anchorTabs');
+  if(tabs){
+    var rows=Array.prototype.slice.call(document.querySelectorAll('#anchorTable tbody tr'));
+    tabs.addEventListener('click',function(ev){
+      var t=ev.target.closest('.tab'); if(!t) return;
+      Array.prototype.forEach.call(tabs.children,function(c){c.classList.toggle('is-active',c===t)});
+      var f=t.getAttribute('data-f');
+      rows.forEach(function(r){r.classList.toggle('hidden', f!=='all' && r.getAttribute('data-f')!==f)});
+    });
+  }
+  var links=Array.prototype.slice.call(document.querySelectorAll('.side a[href^="#"]'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+  if('IntersectionObserver' in window && secs.length){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(a){a.style.color='';a.style.borderLeftColor='';});
+          var i=secs.indexOf(en.target);
+          if(i>-1){links[i].style.color='#187c68';links[i].style.borderLeftColor='#187c68';}
+        }
+      });
+    },{rootMargin:'-80px 0px -70% 0px'});
+    secs.forEach(function(s){io.observe(s)});
+  }
+})();
+</script>
+</body>
+</html>
